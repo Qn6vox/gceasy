@@ -51,7 +51,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'main.tools.LoginCheck'
+    #'main.tools.LoginCheck'
 )
 
 ROOT_URLCONF = 'gceasy.urls'
@@ -88,7 +88,6 @@ DATABASES = {
     'PORT': '3306',
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

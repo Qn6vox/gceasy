@@ -1,7 +1,7 @@
 #coding:utf-8
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
-import json, commands, requests, time
+import commands, time
 import logging
 
 logger = logging.getLogger("default")
