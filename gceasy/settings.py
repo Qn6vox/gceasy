@@ -51,7 +51,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'main.tools.LoginCheck'
+    #'main.tools.LoginCheck'
 )
 
 ROOT_URLCONF = 'gceasy.urls'
@@ -83,7 +83,7 @@ DATABASES = {
     'ENGINE': 'django.db.backends.mysql',
     'NAME':'gceasy',
     'USER': 'root',
-    'PASSWORD': 'dell1950',
+    'PASSWORD': '149162',
     'HOST': '127.0.0.1',
     'PORT': '3306',
     }
