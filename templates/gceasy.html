@@ -1,4 +1,5 @@
-<script src="/static/bootstrap_datepicker/js/bootstrap-datepicker.min.js"></script>
+<script src="/static/bootstrap_datepicker/js/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_datepicker/css/bootstrap-datepicker.css" />
 
 <div class="box">
     <div class="box-header">
@@ -33,7 +34,7 @@
     //日期插件
     $('.input-daterange input').each(function() {
         $(this).datepicker('clearDates');
-    });
+    })
 
 	//提交分析
 	$("#analyze").on("click",function(){
