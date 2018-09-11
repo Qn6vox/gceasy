@@ -1,24 +1,22 @@
-#coding:utf-8
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
-import commands, time, json, webbrowser
-import logging
+import commands, json, logging
 
 logger = logging.getLogger("default")
 
-# Create your views here.
 def mapping(request,method):
     if not method:
         method = "index"
     return eval(method)(request)
 
 def index(request):
-    #从cookie获取当前登陆的帐户
     username = request.COOKIES.get("username","")
     return render_to_response("starter.html",{"username":username})
 
 def gceasy(request):
-    time.sleep(1)
     return render_to_response("gceasy.html")
 
 def analyze(request):
@@ -28,5 +26,5 @@ def analyze(request):
     logger.info(cmd)
     logger.info(result)
     gurl = json.loads(result)
-    url = gurl["graphURL"]
-    return HttpResponse(url)
+    reporturl = gurl["graphURL"]
+    return HttpResponse(json.dumps({"reporturl":reporturl, "result":result}))
