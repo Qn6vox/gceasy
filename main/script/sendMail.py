@@ -10,10 +10,10 @@ def sendMail(content):
     mailpass = "*"
     sender = 'ddop@dangdang.com'
 
-    os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"')
+    os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"' + '> /dev/null 2>&1')
     if os7 == 0:
         iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip('\n')
-        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w 'inet'|awk '{print $2}'|awk -F '/' '{print $1}'" % iface
+        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w 'inet'|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
         host = os.popen(getip).readline()
     else:
         host = os.popen("/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'").readline()
