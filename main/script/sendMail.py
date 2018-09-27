@@ -10,7 +10,14 @@ def sendMail(content):
     mailpass = "*"
     sender = 'ddop@dangdang.com'
 
-    host = os.popen("/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'").readline()
+    os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"')
+    if os7 == 0:
+        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip('\n')
+        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w 'inet'|awk '{print $2}'|awk -F '/' '{print $1}'" % iface
+        host = os.popen(getip).readline()
+    else:
+        host = os.popen("/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'").readline()
+
     addrlist = requests.get("http://dtree.pe.api/getContact?host=%s" % host)
     addrs = json.loads(addrlist.text)
     receivers = []
@@ -43,7 +50,7 @@ def getValues(section, option):
 
 if __name__ == '__main__':
     path = getValues('source', 'path')
-    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea --header "Content-Encoding:zip"' % path
+    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea --header "Content-Type:text"' % path
     status, result = commands.getstatusoutput(cmd)
     data = json.loads(result)
     state = data["isProblem"]
