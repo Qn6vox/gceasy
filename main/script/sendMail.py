@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import json, smtplib, os, requests, commands, ConfigParser
+import json, smtplib, os, requests, commands, ConfigParser, sys
 from email.mime.text import MIMEText
 
 def sendMail(content):
@@ -13,7 +13,7 @@ def sendMail(content):
     os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"' + '> /dev/null 2>&1')
     if os7 == 0:
         iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip('\n')
-        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w 'inet'|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
+        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w inet|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
         host = os.popen(getip).readline()
     else:
         host = os.popen("/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'").readline()
@@ -23,6 +23,12 @@ def sendMail(content):
     receivers = []
     for addr in addrs["contacts"]:
         receivers.append(addr["email"])
+
+    if len(receivers) == 0:
+        try:
+            sys.exit(0)
+        except SystemExit:
+            print("未获取到收件人信息")
 
     msg = MIMEText(content, _subtype='plain', _charset='utf-8')
     msg['Subject'] = "GC 报警邮件"

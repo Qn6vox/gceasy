@@ -21,7 +21,7 @@ def gceasy(request):
 
 def analyze(request):
     path = request.GET.get("path").strip()
-    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea --header "Content-Encoding:zip"' % path
+    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea --header "Content-Type:text"' % path
     status,result = commands.getstatusoutput(cmd)
     logger.info(cmd)
     logger.info(result)
