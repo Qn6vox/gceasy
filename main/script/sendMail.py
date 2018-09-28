@@ -24,11 +24,9 @@ def sendMail(content):
     for addr in addrs["contacts"]:
         receivers.append(addr["email"])
 
-    if len(receivers) == 0:
-        try:
-            sys.exit(0)
-        except SystemExit:
-            print("未获取到收件人信息")
+    if not receivers:
+        print "未获取到收件人信息"
+        sys.exit(0)
 
     msg = MIMEText(content, _subtype='plain', _charset='utf-8')
     msg['Subject'] = "GC 报警邮件"
