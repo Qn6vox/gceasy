@@ -12,7 +12,7 @@ def sendMail(content):
 
     os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"' + '> /dev/null 2>&1')
     if os7 == 0:
-        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){printf $8}}'|head -n 1").read()
+        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip()
         getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w inet|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
         host = os.popen(getip).read()
     else:
