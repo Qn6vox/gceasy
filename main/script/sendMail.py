@@ -12,11 +12,12 @@ def sendMail(content):
 
     os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"' + '> /dev/null 2>&1')
     if os7 == 0:
-        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip('\n')
+        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){printf $8}}'|head -n 1").read()
         getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w inet|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
-        host = os.popen(getip).readline()
+        host = os.popen(getip).read()
     else:
-        host = os.popen("/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'").readline()
+        getip = "/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'"
+        host = os.popen(getip).read()
 
     addrlist = requests.get("http://dtree.pe.api/getContact?host=%s" % host)
     addrs = json.loads(addrlist.text)
@@ -25,10 +26,10 @@ def sendMail(content):
         receivers.append(addr["email"])
 
     if not receivers:
-        print "未获取到收件人信息"
+        print "\033[31;1mError: Recipient not found.\033[0m"
         sys.exit(0)
 
-    msg = MIMEText(content, _subtype='plain', _charset='utf-8')
+    msg = MIMEText(host + ":" + content, _subtype='plain', _charset='utf-8')
     msg['Subject'] = "GC 报警邮件"
     msg['From'] = "ddop@dangdang.com"
     msg['To'] = ";".join(receivers)
