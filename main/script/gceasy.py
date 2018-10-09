@@ -29,7 +29,7 @@ def sendMail(content):
         print "\033[31;1mError: Recipient not found.\033[0m"
         sys.exit(0)
 
-    msg = MIMEText(host + ":" + content, _subtype='plain', _charset='utf-8')
+    msg = MIMEText(host + ": " + content, _subtype='plain', _charset='utf-8')
     msg['Subject'] = "GC 报警邮件"
     msg['From'] = "ddop@dangdang.com"
     msg['To'] = ";".join(receivers)
