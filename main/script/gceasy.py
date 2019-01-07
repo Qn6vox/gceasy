@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
+# @Author:DDop
 
 import json, smtplib, os, requests, commands, ConfigParser, sys
 from email.mime.text import MIMEText
@@ -55,7 +56,7 @@ def getValues(section, option):
 
 if __name__ == '__main__':
     path = getValues('source', 'path')
-    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea --header "Content-Type:text"' % path
+    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea' % path
     result = commands.getoutput(cmd)
     data = json.loads(result)
     state = data["isProblem"]
