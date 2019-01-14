@@ -55,9 +55,14 @@ def getValues(section, option):
     return config.get(section=section, option=option)
 
 if __name__ == '__main__':
+    getcode = 'curl -I -m 3 -o /dev/null -s -w %{http_code} https://api.gceasy.io'
+    code = commands.getoutput(getcode)
+    if int(code) != 200:
+        print "\033[31;1mError: Something wrong with gceasy.\033[0m"
+        sys.exit(0)
     path = getValues('source', 'path')
-    cmd = 'curl -s -X POST --data-binary @%s http://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea' % path
-    result = commands.getoutput(cmd)
+    getreport = 'curl -s -X POST --data-binary @%s https://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea' % path
+    result = commands.getoutput(getreport)
     data = json.loads(result)
     state = data["isProblem"]
 
