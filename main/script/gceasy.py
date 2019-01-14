@@ -12,12 +12,12 @@ def sendMail(content):
     sender = 'ddop@dangdang.com'
 
     os7 = os.system('/bin/cat /etc/redhat-release | grep " 7.*"' + '> /dev/null 2>&1')
-    if not os7:
-        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip()
-        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w inet|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
+    if os7:
+        getip = "/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'"
         host = os.popen(getip).read()
     else:
-        getip = "/sbin/ifconfig|grep -A1 eth[01]|grep -m1 inet|awk -F: '{printf $2}'|awk '{printf $1}'"
+        iface = os.popen("/sbin/route -n|awk '{if($4~/UG/){print $8}}'|head -n 1").read().strip()
+        getip = "/sbin/ip a|grep -B1 -C1 -w %s|grep -w inet|awk '{printf $2}'|awk -F '/' '{printf $1}'" % iface
         host = os.popen(getip).read()
 
     addrlist = requests.get("http://dtree.pe.api/getContact?host=%s" % host)
@@ -27,7 +27,7 @@ def sendMail(content):
         receivers.append(addr["email"])
 
     if not receivers:
-        print "\033[31;1mError: Recipient not found.\033[0m"
+        print "Error: Recipient not found."
         sys.exit(0)
 
     msg = MIMEText(host + ": " + content, _subtype='plain', _charset='utf-8')
@@ -58,14 +58,16 @@ if __name__ == '__main__':
     getcode = 'curl -I -m 3 -o /dev/null -s -w %{http_code} https://api.gceasy.io'
     code = commands.getoutput(getcode)
     if int(code) != 200:
-        print "\033[31;1mError: Something wrong with gceasy.\033[0m"
+        print "Error: Something wrong with gceasy."
         sys.exit(0)
     path = getValues('source', 'path')
-    getreport = 'curl -s -X POST --data-binary @%s https://api.gceasy.io/analyzeGC?apiKey=6d79606b-28d1-4bf5-a03e-64e28b0422ea --header "Content-Type:text"' % path
+    apiKey = "6d79606b-28d1-4bf5-a03e-64e28b0422ea"
+    ctype = '--header "Content-Type:text"'
+    getreport = 'curl -s -X POST --data-binary @%s https://api.gceasy.io/analyzeGC?apiKey=%s %s' % (path, apiKey, ctype)
     result = commands.getoutput(getreport)
     data = json.loads(result)
     if "isProblem" not in data.keys():
-        print "\033[31;1mError: Something wrong with report.\033[0m"
+        print "Error: Something wrong with report."
         sys.exit(0)
     state = data["isProblem"]
 

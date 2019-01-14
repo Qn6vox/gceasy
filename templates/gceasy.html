@@ -7,18 +7,18 @@
 		<h3 class="box-title">选取时间段</h3>
 	</div>
     <div class="box-body">
-        <div class="input-group input-daterange col-md-4">
-            <input type="text" class="form-control" id="start" />
+        <div class="input-group input-daterange col-md-3">
+            <input type="text" class="form-control" id="starttime" />
             <span class="input-group-addon">to</span>
-            <input type="text" class="form-control" id="end" />
+            <input type="text" class="form-control" id="endtime" />
         </div>
     </div>
 	<div class="box-header">
-		<h3 class="box-title">日志文件路径</h3>
+		<h3 class="box-title">目标IP</h3>
 	</div>
 	<div class="box-body">
-		<div class="col-md-4">
-			<input type="text" class="form-control" id="logPath">
+		<div class="col-md-2">
+			<input type="text" class="form-control" id="targetip">
 		</div>
 		<div class="col-md-2">
 			<button class="btn btn-info btn-sm" id="analyze">分析</button>
@@ -40,11 +40,11 @@
 	//提交分析
 	$("#analyze").on("click",function(){
 		//获取输入的日志路径
-		path = $("#logPath").val().trim()
-        if (path == ""){
-		    alert("请输入日志文件路径")
+		targetip = $("#targetip").val().trim()
+        if (targetip == ""){
+		    alert("请输入目标机器IP")
         }else {
-		    url = "/analyze?path="+path
+		    url = "/analyze?targetip="+targetip
             $("#loadingwait").show()
             $.get(url,function (data) {
                 reporturl = data["reporturl"]
