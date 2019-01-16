@@ -55,11 +55,6 @@ def getValues(section, option):
     return config.get(section=section, option=option)
 
 if __name__ == '__main__':
-    getcode = 'curl -I -m 3 -o /dev/null -s -w %{http_code} https://api.gceasy.io'
-    code = commands.getoutput(getcode)
-    if int(code) != 200:
-        print "Error: Something wrong with gceasy."
-        sys.exit(0)
     path = getValues('source', 'path')
     apiKey = "6d79606b-28d1-4bf5-a03e-64e28b0422ea"
     ctype = '--header "Content-Type:text"'
