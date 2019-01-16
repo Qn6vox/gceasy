@@ -3,6 +3,7 @@
 
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
+from models import Record
 import commands, json, logging, os
 
 logger = logging.getLogger("default")
@@ -21,7 +22,7 @@ def gceasy(request):
 
 def analyze(request):
     code = 500
-    msg, result, reporturl = ""
+    msg, result, reporturl = "", "", ""
     ip = request.GET.get("targetip").strip()
     fpath = "/data/joblog/java-app-gc.log"
     tpath = "/data/joblog"
@@ -46,5 +47,6 @@ def analyze(request):
             msg = "Error: Something wrong with report."
         else:
             reporturl = data["graphURL"]
+            Record(ip=ip, url=reporturl).save()
             code = 200
-    return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":data}))
+    return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":result}))
