@@ -4,7 +4,7 @@
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
 from models import Record
-import commands, json, logging, os
+import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
 
@@ -20,6 +20,9 @@ def index(request):
 def gceasy(request):
     return render_to_response("gceasy.html")
 
+def confissue(request):
+    return render_to_response("confissue.html")
+
 def analyze(request):
     code = 500
     msg, result, reporturl = "", "", ""
@@ -29,8 +32,7 @@ def analyze(request):
     os.system('[ ! -d %s ] && mkdir -p %s' % (tpath, tpath))
     getlog = 'rsync -e "ssh -o StrictHostKeyChecking=no" -a root@%s:%s %s/' % (ip, fpath, tpath)
     status,gclog = commands.getstatusoutput(getlog)
-    logger.info(getlog)
-    logger.info(gclog)
+    logger.info(str(getlog) + " -- code:" + str(status))
     if status:
         msg = "Error: Something wrong with getlog."
     else:
@@ -50,3 +52,42 @@ def analyze(request):
             Record(ip=ip, url=reporturl).save()
             code = 200
     return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":result}))
+
+def syn(ip, q):
+    shpath = "/data/project/gceasy/main/script"
+    propath = "/root/gceasy"
+    os.system('[ ! -d %s ] && mkdir -p %s' % (propath, propath))
+    rscmd = 'rsync -e "ssh -o StrictHostKeyChecking=no" -a %s/ root@%s:%s/' % (shpath, ip, propath)
+    status, rsshell = commands.getstatusoutput(rscmd)
+    logger.info(str(rscmd) + " -- code:" + str(status))
+    if status:
+        code = 500
+        msg = "Error: Rsync conf is failed."
+    else:
+        shcmd = 'ssh -o StrictHostKeyChecking=no root@%s "/bin/sh /root/gceasy/iniconfig.sh"' % ip
+        status, shres = commands.getstatusoutput(shcmd)
+        logger.info(str(shcmd) + " -- code:" + str(status))
+        if status:
+            code = 500
+            msg = "Error: Script execution error."
+        else:
+            code = 200
+            msg = "Successful."
+    q.put({"code":code,"ip":ip,"msg":msg})
+
+def issue(request):
+    codelist = []
+    que = Queue.Queue()
+    iplist = request.POST.get("iplist").strip()
+    ips = re.split("[ |,|;|\t|\n]", iplist)
+    logger.info(ips)
+    for ip in ips:
+        t = threading.Thread(target=syn, args=[ip, que])
+        t.start()
+    while True:
+        if que.qsize() == len(ips):
+            while not que.empty():
+                r = que.get()
+                codelist.append(r)
+            logger.info(codelist)
+            return HttpResponse("\n".join(["IP:%s %s" %(item["ip"],item["msg"]) for item in codelist]))
