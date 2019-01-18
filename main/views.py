@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
 from models import Record
 from django.db.models import Q
-import commands, json, logging, os, re, threading, Queue, time
+import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
 
@@ -17,6 +17,7 @@ def mapping(request,method):
 def index(request):
     username = request.COOKIES.get("username","")
     return render_to_response("starter.html",{"username":username})
+
 # 日志分析
 def gceasy(request):
     return render_to_response("gceasy.html")
