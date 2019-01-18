@@ -20,9 +20,6 @@ def index(request):
 def gceasy(request):
     return render_to_response("gceasy.html")
 
-def confissue(request):
-    return render_to_response("confissue.html")
-
 def analyze(request):
     code = 500
     msg, result, reporturl = "", "", ""
@@ -52,6 +49,9 @@ def analyze(request):
             Record(ip=ip, url=reporturl).save()
             code = 200
     return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":result}))
+
+def confissue(request):
+    return render_to_response("confissue.html")
 
 def syn(ip, q):
     shpath = "/data/project/gceasy/main/script"
@@ -91,3 +91,17 @@ def issue(request):
                 codelist.append(r)
             logger.info(codelist)
             return HttpResponse("\n".join(["IP:%s %s" %(item["ip"],item["msg"]) for item in codelist]))
+
+def hisrecord(request):
+    return render_to_response("hisrecord.html")
+
+def checkhis(request):
+    checkip = request.GET.get("checkip","").strip()
+    logger.info(checkip)
+    starttime = request.POST.get("starttime","").strip()
+    logger.info(starttime)
+    endtime = request.POST.get("endtime","").strip()
+    logger.info(endtime)
+    records = Record.objects.filter(ip=checkip)
+
+    return render_to_response("hisrecord.html",{"records":records})
