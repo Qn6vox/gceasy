@@ -17,7 +17,7 @@ def mapping(request,method):
 def index(request):
     username = request.COOKIES.get("username","")
     return render_to_response("starter.html",{"username":username})
-
+# 日志分析
 def gceasy(request):
     return render_to_response("gceasy.html")
 
@@ -51,6 +51,7 @@ def analyze(request):
             code = 200
     return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":result}))
 
+# 配置分发
 def confissue(request):
     return render_to_response("confissue.html")
 
@@ -93,6 +94,7 @@ def issue(request):
             logger.info(codelist)
             return HttpResponse("\n".join(["IP: %s %s" %(item["ip"],item["msg"]) for item in codelist]))
 
+# 历史记录
 def hisrecord(request):
     return render_to_response("hisrecord.html")
 
