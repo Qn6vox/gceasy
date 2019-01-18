@@ -16,38 +16,41 @@
 		<h3 class="box-title">查询IP</h3>
 	</div>
 	<div class="box-body">
-		<div class="col-md-2">
-			<input type="text" class="form-control" id="checkip" >
-		</div>
-		<div class="col-md-2">
-			<button class="btn btn-info btn-sm" id="checkrecord">查询</button>
-		</div>
+        <div class="row">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="checkip" value="{{ checkip }}" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-info btn-sm" id="checkrecord">查询</button>
+            </div>
+        </div>
+        <div class="row" style="margin:10px 3px 0px 3px">
+            <table class="table table-bordered table-striped" id="recordTable">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th style="min-width: 56px;">查询时间</th>
+                        <th>报告链接</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        <tr>
+                            <td>{{ record.ip }}</td>
+                            <td>{{ record.time|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ record.url }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 	</div>
-</div>
-<div id="recordInfo">
-    <table class="table table-bordered table-striped" id="recordTable">
-        <thead>
-            <tr>
-                <th>IP</th>
-                <th>查询时间</th>
-                <th>报告链接</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in records %}
-                <tr>
-                    <td>{{ record.ip }}</td>
-                    <td>{{ record.time|date:"Y-m-d H:i:s" }}</td>
-                    <td>{{ record.url }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </div>
 
 <script>
     //控制<请稍等>
     $("#loadingwait").hide();
+    $('#recordTable').DataTable()
 
     //日期插件
     $('.input-daterange input').each(function() {
@@ -61,12 +64,16 @@
         //获取输入的时间
         starttime = $("#starttime").val().trim();
         endtime = $("#endtime").val().trim();
-        if (checkip == ""){
-		    alert("请输入查询机器IP")
+        if (starttime > endtime){
+            alert("开始时间必须小于结束时间")
         }else {
-		    url = "/checkhis?checkip="+checkip;
-            $("#loadingwait").show();
-            $("#info").load(url)
+            if (checkip == ""){
+		        alert("请输入查询机器IP")
+            }else {
+                url = "/checkhis?checkip="+checkip+"&starttime="+starttime+"&endtime="+endtime;
+                $("#loadingwait").show();
+                $("#info").load(url)
+            }
         }
 	})
 </script>
