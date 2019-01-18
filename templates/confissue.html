@@ -13,12 +13,13 @@
 </div>
 
 <script>
+    //控制PageHeader
+    $("#pageheader").html($(".treeview-menu .active").children("a").html())
     //控制<请稍等>
     $("#loadingwait").hide();
 
 	//提交机器列表
 	$("#issue").on("click",function(){
-		//获取输入的IP
 		iplist = $("#iplist").val().trim();
         if (iplist == ""){
 		    alert("请输入机器IP")
@@ -29,6 +30,7 @@
                 $("#loadingwait").hide();
                 alert(data)
             })
+            $(this).blur()
         }
 	})
 </script>

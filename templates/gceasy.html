@@ -29,6 +29,8 @@
 <pre id="Canvas" class="Canvas well resizable" style="height:100%;overflow:auto;margin-bottom:0px;"></pre>
 
 <script>
+    //控制PageHeader
+    $("#pageheader").html($(".treeview-menu .active").children("a").html())
     //控制<请稍等>
     $("#loadingwait").hide();
 
@@ -39,7 +41,6 @@
 
 	//提交分析
 	$("#analyze").on("click",function(){
-		//获取输入的IP
 		targetip = $("#targetip").val().trim();
         if (targetip == ""){
 		    alert("请输入目标机器IP")
@@ -60,6 +61,7 @@
                     alert(data["msg"])
                 }
             },"json")
+            $(this).blur()
         }
 	})
 </script>

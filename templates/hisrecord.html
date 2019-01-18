@@ -48,8 +48,11 @@
 </div>
 
 <script>
+    //控制PageHeader
+    $("#pageheader").html($(".treeview-menu .active").children("a").html())
     //控制<请稍等>
     $("#loadingwait").hide();
+    //Table样式
     $('#recordTable').DataTable()
 
     //日期插件
@@ -59,9 +62,7 @@
 
 	//提交查询
 	$("#checkrecord").on("click",function(){
-		//获取输入的IP
 		checkip = $("#checkip").val().trim();
-        //获取输入的时间
         starttime = $("#starttime").val().trim();
         endtime = $("#endtime").val().trim();
         if (starttime > endtime){
