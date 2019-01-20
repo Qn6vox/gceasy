@@ -1,0 +1,80 @@
+<script src="/static/bootstrap_datepicker/js/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_datepicker/css/bootstrap-datepicker.css" />
+
+<div class="box">
+    <div class="box-header">
+		<h3 class="box-title">选取时间段</h3>
+	</div>
+    <div class="box-body">
+        <div class="input-group input-daterange col-md-3">
+            <input type="text" class="form-control" id="starttime" />
+            <span class="input-group-addon">to</span>
+            <input type="text" class="form-control" id="endtime" />
+        </div>
+    </div>
+	<div class="box-header">
+		<h3 class="box-title">查询IP</h3>
+	</div>
+	<div class="box-body">
+        <div class="row">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="checkip" value="{{ checkip }}" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-info btn-sm" id="checkrecord">查询</button>
+            </div>
+        </div>
+        <div class="row" style="margin:10px 3px 0px 3px">
+            <table class="table table-bordered table-striped" id="recordTable">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th style="min-width: 56px;">查询时间</th>
+                        <th>报告链接</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                        <tr>
+                            <td>{{ record.ip }}</td>
+                            <td>{{ record.time|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ record.url }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+	</div>
+</div>
+
+<script>
+    //控制PageHeader
+    $("#pageheader").html($(".treeview-menu .active").children("a").html())
+    //控制<请稍等>
+    $("#loadingwait").hide();
+    //Table样式
+    $('#recordTable').DataTable()
+
+    //日期插件
+    $('.input-daterange input').each(function() {
+        $(this).datepicker('clearDates');
+    })
+
+	//提交查询
+	$("#checkrecord").on("click",function(){
+		checkip = $("#checkip").val().trim();
+        starttime = $("#starttime").val().trim();
+        endtime = $("#endtime").val().trim();
+        if (starttime > endtime){
+            alert("开始时间必须小于结束时间")
+        }else {
+            if (checkip == ""){
+		        alert("请输入查询机器IP")
+            }else {
+                url = "/checkhis?checkip="+checkip+"&starttime="+starttime+"&endtime="+endtime;
+                $("#loadingwait").show();
+                $("#info").load(url)
+            }
+        }
+	})
+</script>

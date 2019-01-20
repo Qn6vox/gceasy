@@ -29,8 +29,10 @@
 <pre id="Canvas" class="Canvas well resizable" style="height:100%;overflow:auto;margin-bottom:0px;"></pre>
 
 <script>
+    //控制PageHeader
+    $("#pageheader").html($(".treeview-menu .active").children("a").html())
     //控制<请稍等>
-    $("#loadingwait").hide()
+    $("#loadingwait").hide();
 
     //日期插件
     $('.input-daterange input').each(function() {
@@ -39,27 +41,27 @@
 
 	//提交分析
 	$("#analyze").on("click",function(){
-		//获取输入的IP
-		targetip = $("#targetip").val().trim()
+		targetip = $("#targetip").val().trim();
         if (targetip == ""){
 		    alert("请输入目标机器IP")
         }else {
-		    url = "/analyze?targetip="+targetip
-            $("#loadingwait").show()
+		    url = "/analyze?targetip="+targetip;
+            $("#loadingwait").show();
             $.get(url,function (data) {
-                code = data["code"]
-                $("#loadingwait").hide()
+                code = data["code"];
+                $("#loadingwait").hide();
                 if (code == 200){
-                    reporturl = data["reporturl"]
-                    result = data["result"]
+                    reporturl = data["reporturl"];
+                    result = data["result"];
                     //展示返回数据
-                    $("#Canvas").html(formatJson(result))
+                    $("#Canvas").html(formatJson(result));
                     //浏览器新tab页访问截取的url
                     window.open(reporturl)
                 }else {
                     alert(data["msg"])
                 }
             },"json")
+            $(this).blur()
         }
 	})
 </script>

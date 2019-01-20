@@ -4,6 +4,7 @@
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
 from models import Record
+from django.db.models import Q
 import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
@@ -17,11 +18,9 @@ def index(request):
     username = request.COOKIES.get("username","")
     return render_to_response("starter.html",{"username":username})
 
+# 日志分析
 def gceasy(request):
     return render_to_response("gceasy.html")
-
-def confissue(request):
-    return render_to_response("confissue.html")
 
 def analyze(request):
     code = 500
@@ -52,6 +51,10 @@ def analyze(request):
             Record(ip=ip, url=reporturl).save()
             code = 200
     return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":result}))
+
+# 配置分发
+def confissue(request):
+    return render_to_response("confissue.html")
 
 def syn(ip, q):
     shpath = "/data/project/gceasy/main/script"
@@ -90,4 +93,21 @@ def issue(request):
                 r = que.get()
                 codelist.append(r)
             logger.info(codelist)
-            return HttpResponse("\n".join(["IP:%s %s" %(item["ip"],item["msg"]) for item in codelist]))
+            return HttpResponse("\n".join(["IP: %s %s" %(item["ip"],item["msg"]) for item in codelist]))
+
+# 历史记录
+def hisrecord(request):
+    return render_to_response("hisrecord.html")
+
+def checkhis(request):
+    checkip = request.GET.get("checkip","").strip()
+    stime = request.GET.get("starttime","").strip()
+    etime = request.GET.get("endtime","").strip()
+    logger.info("checkrecordip:" + str(checkip) + " starttime:" + str(stime) + " endtime:" + str(etime))
+    if stime == etime == "":
+        records = Record.objects.filter(ip=checkip)
+    elif stime == etime:
+        records = Record.objects.filter(Q(ip=checkip), Q(time__gt=stime,time__lt="%s 23:59:59" % etime))
+    else:
+        records = Record.objects.filter(Q(ip=checkip), Q(time__gt="%s 23:59:59" %stime, time__lt=etime))
+    return render_to_response("hisrecord.html",{"records":records,"checkip":checkip})
