@@ -14,7 +14,7 @@
 
 <script>
     //控制PageHeader
-    $("#pageheader").html($(".treeview-menu .active").children("a").html())
+    $("#pageheader").html($(".treeview-menu .active").children("a").html());
     //控制<请稍等>
     $("#loadingwait").hide();
 
@@ -24,12 +24,12 @@
         if (iplist == ""){
 		    alert("请输入机器IP")
         }else {
-		    url = "/issue"
+		    url = "/issue";
             $("#loadingwait").show();
             $.post(url,{"iplist":iplist},function (data) {
                 $("#loadingwait").hide();
                 alert(data)
-            })
+            });
             $(this).blur()
         }
 	})

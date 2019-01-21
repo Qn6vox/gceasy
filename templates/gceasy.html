@@ -30,14 +30,14 @@
 
 <script>
     //控制PageHeader
-    $("#pageheader").html($(".treeview-menu .active").children("a").html())
+    $("#pageheader").html($(".treeview-menu .active").children("a").html());
     //控制<请稍等>
     $("#loadingwait").hide();
 
     //日期插件
     $('.input-daterange input').each(function() {
         $(this).datepicker('clearDates');
-    })
+    });
 
 	//提交分析
 	$("#analyze").on("click",function(){
@@ -60,7 +60,7 @@
                 }else {
                     alert(data["msg"])
                 }
-            },"json")
+            },"json");
             $(this).blur()
         }
 	})
