@@ -3,12 +3,24 @@
 		<h3 class="box-title">机器列表</h3>
 	</div>
 	<div class="box-body">
-        <div class="modal-body">
-            <textarea id="iplist" class="form-control" rows="5" style="resize:none" placeholder="多个关键词"></textarea>
+        <div class="row">
+            <div class="modal-body">
+                <textarea id="iplist" class="form-control" rows="5" style="resize:none" placeholder="多个关键词"></textarea>
+            </div>
         </div>
-		<div class="col-md-2">
-			<button class="btn btn-info btn-sm" id="issue">分发</button>
-		</div>
+	</div>
+    <div class="box-header">
+		<h3 class="box-title">应用名称</h3>
+	</div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="appname">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-info btn-sm" id="issue">分发</button>
+            </div>
+        </div>
 	</div>
 </div>
 
@@ -21,12 +33,13 @@
 	//提交机器列表
 	$("#issue").on("click",function(){
 		iplist = $("#iplist").val().trim();
-        if (iplist == ""){
-		    alert("请输入机器IP")
+		appname = $("#appname").val().trim();
+        if (iplist  == "" || appname == ""){
+		    alert("请输入机器IP和应用名称")
         }else {
 		    url = "/issue";
             $("#loadingwait").show();
-            $.post(url,{"iplist":iplist},function (data) {
+            $.post(url,{"iplist":iplist, "appname":appname},function (data) {
                 $("#loadingwait").hide();
                 alert(data)
             });

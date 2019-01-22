@@ -17,12 +17,24 @@
 		<h3 class="box-title">目标IP</h3>
 	</div>
 	<div class="box-body">
-		<div class="col-md-2">
-			<input type="text" class="form-control" id="targetip">
-		</div>
-		<div class="col-md-2">
-			<button class="btn btn-info btn-sm" id="analyze">分析</button>
-		</div>
+        <div class="row">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="targetip">
+            </div>
+        </div>
+	</div>
+    <div class="box-header">
+		<h3 class="box-title">应用名称</h3>
+	</div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="appname">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-info btn-sm" id="analyze">分析</button>
+            </div>
+        </div>
 	</div>
 </div>
 
@@ -42,10 +54,11 @@
 	//提交分析
 	$("#analyze").on("click",function(){
 		targetip = $("#targetip").val().trim();
-        if (targetip == ""){
-		    alert("请输入目标机器IP")
+		appname = $("#appname").val().trim();
+        if (targetip == "" || appname == ""){
+		    alert("请输入目标机器IP和应用名称")
         }else {
-		    url = "/analyze?targetip="+targetip;
+		    url = "/analyze?targetip="+targetip+"&appname="+appname;
             $("#loadingwait").show();
             $.get(url,function (data) {
                 code = data["code"];
