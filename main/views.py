@@ -73,7 +73,11 @@ def analyze(request):
     appname = request.GET.get("appname").strip()
     confpath = "/root/gceasy/%s/logpath.conf" % appname
     getpath = "ssh -o StrictHostKeyChecking=no root@%s \"awk '/path/ {print}' %s\"" % (ip, confpath)
-    fpath = commands.getoutput(getpath).split("=")[1]
+    try:
+        fpath = commands.getoutput(getpath).split("=")[1]
+    except IndexError:
+        msg = "Error: Something wrong with ip or appname."
+        return HttpResponse(json.dumps({"code": code, "msg": msg}))
     tpath = "/data/joblog"
     os.system('[ %s ] && mkdir -p %s' % (tpath, tpath))
     getlog = 'rsync -e "ssh -o StrictHostKeyChecking=no" -a root@%s:%s %s/' % (ip, fpath, tpath)
