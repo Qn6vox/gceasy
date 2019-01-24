@@ -25,7 +25,5 @@ else
     sed -i "s!^path.*!path=$gclogpath!" $confpath
 fi
 
-cat $confpath >> $apppath/iniconfig.log
-
 echo "1 3 * * * /usr/bin/python $apppath/sendmail.py >> $apppath/crontab.log" >> /var/spool/cron/root
 /etc/init.d/crond reload > /dev/null 2>&1

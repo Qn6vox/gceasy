@@ -105,7 +105,8 @@ def analyze(request):
 
 # 历史记录
 def hisrecord(request):
-    return render_to_response("hisrecord.html")
+    records = Record.objects.all()
+    return render_to_response("hisrecord.html", {"records":records})
 
 def checkhis(request):
     checkip = request.GET.get("checkip", "").strip()
