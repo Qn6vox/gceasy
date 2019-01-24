@@ -38,7 +38,7 @@
                         <tr>
                             <td>{{ record.ip }}</td>
                             <td>{{ record.time|date:"Y-m-d H:i:s" }}</td>
-                            <td>{{ record.url }}</td>
+                            <td><a href="{{ record.url }}" target="_blank">{{ record.url }}</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -68,13 +68,9 @@
         if (starttime > endtime){
             alert("开始时间必须小于结束时间")
         }else {
-            if (checkip == ""){
-		        alert("请输入查询机器IP")
-            }else {
-                url = "/checkhis?checkip="+checkip+"&starttime="+starttime+"&endtime="+endtime;
-                $("#loadingwait").show();
-                $("#info").load(url)
-            }
+            url = "/checkhis?checkip="+checkip+"&starttime="+starttime+"&endtime="+endtime;
+            $("#loadingwait").show();
+            $("#info").load(url);
         }
 	})
 </script>
