@@ -55,10 +55,12 @@
 	$("#analyze").on("click",function(){
 		targetip = $("#targetip").val().trim();
 		appname = $("#appname").val().trim();
+		starttime = $("#starttime").val().trim();
+		endtime = $("#endtime").val().trim();
         if (targetip == "" || appname == ""){
 		    alert("请输入目标机器IP和应用名称")
         }else {
-		    url = "/analyze?targetip="+targetip+"&appname="+appname;
+		    url = "/analyze?targetip="+targetip+"&appname="+appname+"&starttime="+starttime+"&endtime="+endtime;
             $("#loadingwait").show();
             $.get(url,function (data) {
                 code = data["code"];
@@ -76,5 +78,14 @@
             },"json");
             $(this).blur()
         }
-	})
+	});
+
+    //回车提交
+    document.onkeydown = function(){
+        const e = event || window.event;
+        if (e.keyCode == 13){
+            $("#analyze").click();
+			return false;
+        }
+    };
 </script>

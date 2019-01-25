@@ -71,6 +71,8 @@ def analyze(request):
     msg, result, reporturl = "", "", ""
     ip = request.GET.get("targetip").strip()
     appname = request.GET.get("appname").strip()
+    stime = request.GET.get("starttime", "").strip()
+    etime = request.GET.get("endtime", "").strip()
     confpath = "/root/gceasy/%s/logpath.conf" % appname
     getpath = "ssh -o StrictHostKeyChecking=no root@%s \"awk '/path/ {print}' %s\"" % (ip, confpath)
     try:
@@ -90,7 +92,12 @@ def analyze(request):
         arg = "-s -X POST --data-binary"
         apiKey = "6d79606b-28d1-4bf5-a03e-64e28b0422ea"
         contype = '--header "Content-Type:text"'
-        getreport = 'curl %s @%s https://api.gceasy.io/analyzeGC?apiKey=%s %s' % (arg, path, apiKey, contype)
+        if stime == etime == "":
+            getreport = 'curl %s @%s https://api.gceasy.io/analyzeGC?apiKey=%s %s' % (arg, path, apiKey, contype)
+        else:
+            st = "%sT00%%3A00%%3A00.000-0700" % stime
+            et = "%sT24%%3A00%%3A00.000-0700" % etime
+            getreport = 'curl %s @%s https://api.gceasy.io/analyzeGC?apiKey=%s&startTime=%s&endTime=%s' % (arg, path, apiKey, st, et)
         status, result = commands.getstatusoutput(getreport)
         logger.info(getreport)
         logger.info(result)
