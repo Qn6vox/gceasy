@@ -59,8 +59,10 @@
 		endtime = $("#endtime").val().trim();
         if (targetip == "" || appname == ""){
 		    alert("请输入目标机器IP和应用名称")
+        }else if (starttime > endtime) {
+            alert("开始时间必须小于结束时间")
         }else {
-		    url = "/analyze?targetip="+targetip+"&appname="+appname+"&starttime="+starttime+"&endtime="+endtime;
+            url = "/analyze?targetip="+targetip+"&appname="+appname+"&starttime="+starttime+"&endtime="+endtime;
             $("#loadingwait").show();
             $.get(url,function (data) {
                 code = data["code"];

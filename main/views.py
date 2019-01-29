@@ -4,16 +4,60 @@
 from django.shortcuts import render_to_response
 from django.http.response import HttpResponse
 from django.db.models import Q
-from models import Record
+from models import Users, Record
 import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
 
 def mapping(request, method):
     if not method:
-        method = "index"
+        method = "login"
     return eval(method)(request)
 
+# 登录
+def login(request):
+    if request.method == "GET":
+        return render_to_response("login.html")
+
+    username = request.POST.get("username", "")
+    passwd = request.POST.get("passwd", "")
+    code = 500
+    msg = ""
+    try:
+        Users.objects.get(name=username, password=passwd)
+        code = 200
+        url = "/index"
+    except Users.DoesNotExist:
+        msg = "用户名或密码错误，请重新输入"
+        url = "/"
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
+
+# 注册
+def register(request):
+    if request.method == "GET":
+        return render_to_response("register.html")
+
+    username = request.POST.get("username", "")
+    passwd = request.POST.get("passwd", "")
+    phonenum = request.POST.get("phonenum", "")
+    email = request.POST.get("email", "")
+    try:
+        Users.objects.get(name=username)
+        code = 500
+        msg = "用户名已被注册，请重新注册"
+        url = "/register"
+    except Users.DoesNotExist:
+        Users(name=username, password=passwd, phonenum=phonenum, email=email).save()
+        code = 200
+        msg = "注册成功，请登录"
+        url = "/login"
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "url": url}))
+
+# 找回密码
+def resetpasswd(request):
+    return render_to_response("resetpasswd.html")
+
+# 首页
 def index(request):
     username = request.COOKIES.get("username", "")
     return render_to_response("starter.html", {"username":username})
