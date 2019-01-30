@@ -6,6 +6,7 @@ from django.http.response import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from models import Users, Record
 from tools import enpasswd
+from ldapUtils import ldapLogin
 import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
@@ -23,19 +24,29 @@ def login(request):
     username = request.POST.get("username", "")
     passwd = request.POST.get("passwd", "")
     code = 500
-    msg = ""
-    try:
-        Users.objects.get(name=username, password=enpasswd(passwd))
+
+    # ldap登录校验
+    logged, msg = ldapLogin(username, passwd)
+    logger.info(str(username) + " " + str(msg))
+    if logged:
         code = 200
         request.session["logged"] = True
-        request.session["name"] = username
-        url = "/index"
-    except Users.DoesNotExist:
-        msg = "用户名或密码错误，请重新输入"
-        url = "/"
-    respones = HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
-    respones.set_cookie('username', username)
-    return respones
+        request.session["username"] = username
+    url = request.session.get("url", "/index")
+
+    # 普通登录校验
+    # try:
+    #     Users.objects.get(name=username, password=enpasswd(passwd))
+    #     code = 200
+    #     request.session["logged"] = True
+    #     request.session["username"] = username
+    #     url = request.session.get("url", "/index")
+    # except Users.DoesNotExist:
+    #     msg = "用户名或密码错误，请重新输入"
+    #     url = request.session.get("url", "/")
+
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
+
 
 # 登出
 def logout(request):
@@ -69,14 +80,14 @@ def resetpasswd(request):
 
 # 首页
 def index(request):
-    username = request.COOKIES.get("username", "")
+    username = request.session.get("username", "")
     return render_to_response("starter.html", {"username":username})
 
 # 配置分发
 def confissue(request):
     return render_to_response("confissue.html")
 
-def syn(ip, q, appname):
+def sync(ip, q, appname):
     shpath = "/root/gceasy"
     propath = "/root/gceasy/%s" % appname
     os.system('ssh -o StrictHostKeyChecking=no root@%s "[ %s ] && mkdir -p %s"' % (ip, propath, propath))
@@ -106,7 +117,7 @@ def issue(request):
     ips = re.split("[ |,|;|\t|\n]", iplist)
     logger.info(ips)
     for ip in ips:
-        t = threading.Thread(target=syn, args=[ip, q, appname])
+        t = threading.Thread(target=sync, args=[ip, q, appname])
         t.start()
     while True:
         if q.qsize() == len(ips):

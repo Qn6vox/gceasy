@@ -42,7 +42,7 @@
     </div>
     <div class="row">
       <div class="col-xs-8" style="margin-top: 8px">
-        <a href="/register">新用户请注册</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/resetpasswd">找回密码</a>
+        <a href="/register">新用户请注册</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="/resetpasswd">重置密码</a>
       </div>
       <div class="col-xs-4">
         <button id="loginSubmit" class="btn btn-primary btn-block btn-flat">登录</button>
@@ -76,7 +76,7 @@
   document.onkeydown = function(){
     const e = event || window.event;
     if (e.keyCode == 13){
-      $("#checkrecord").click();
+      $("#loginSubmit").click();
       return false;
     }
   };
