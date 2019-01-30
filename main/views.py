@@ -2,9 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 from django.shortcuts import render_to_response
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from models import Users, Record
+from tools import enpasswd
 import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
@@ -24,13 +25,22 @@ def login(request):
     code = 500
     msg = ""
     try:
-        Users.objects.get(name=username, password=passwd)
+        Users.objects.get(name=username, password=enpasswd(passwd))
         code = 200
+        request.session["logged"] = True
+        request.session["name"] = username
         url = "/index"
     except Users.DoesNotExist:
         msg = "用户名或密码错误，请重新输入"
         url = "/"
-    return HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
+    respones = HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
+    respones.set_cookie('username', username)
+    return respones
+
+# 登出
+def logout(request):
+    request.session["logged"] = False
+    return HttpResponseRedirect('/login')
 
 # 注册
 def register(request):
@@ -47,7 +57,7 @@ def register(request):
         msg = "用户名已被注册，请重新注册"
         url = "/register"
     except Users.DoesNotExist:
-        Users(name=username, password=passwd, phonenum=phonenum, email=email).save()
+        Users(name=username, password=enpasswd(passwd), phonenum=phonenum, email=email).save()
         code = 200
         msg = "注册成功，请登录"
         url = "/login"

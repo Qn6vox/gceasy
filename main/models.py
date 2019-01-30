@@ -5,7 +5,7 @@ class Users(models.Model):
     # 用户名
     name = models.CharField(max_length=30)
     # 密码
-    password = models.CharField(max_length=30)
+    password = models.CharField(max_length=35)
     # 手机号
     phonenum = models.CharField(max_length=15)
     # 邮箱

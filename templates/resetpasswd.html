@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>找回密码</title>
+  <title>重置密码</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
@@ -11,96 +11,99 @@
   <link rel="icon" href="/static/ico/favicon.ico" />
 
 <style>
-	.login-box{
-	    border-radius: 20px;
-	    width: 360px;
-	    height: 75%;
-	    margin: auto;
-	    position: absolute;
-	    top: 0;
-	    left: 0;
-	    right: 0;
-	    bottom: 0;
-	}
+  .register-box{
+    border-radius: 20px;
+    width: 360px;
+    height: 75%;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 </style>
 </head>
-<body class="hold-transition login-page" style="background-image:url(/static/img/bg.jpg); background-repeat:no-repeat; background-size:100%;">
-<div class="login-box">
-    <div class="login-logo">
-        <a>验证信息</a>
-    </div>
-    <div class="register-box-body">
-        <p class="register-box-msg" id="resetMsg">Sign up to JVM system</p>
+<body class="hold-transition register-page" style="background-image:url(/static/img/bg.jpg); background-repeat:no-repeat; background-size:100%;">
+<div class="register-box">
+  <div class="register-logo">
+    <a>验证信息</a>
+  </div>
+  <div class=register-box-body>
+    <p class=register-box-msg id="registerMsg">Reset your password</p>
 
-        <div class="form-group has-feedback">
-            <input id="username" class="form-control" placeholder="Username">
-            <span class="fa fa-fw fa-user form-control-feedback"></span>
-        </div>
-        <div class="form-group has-feedback">
-            <input id="passwd" type="password" class="form-control" placeholder="Password">
-            <span class="fa fa-fw fa-lock form-control-feedback"></span>
-        </div>
-        <div class="form-group has-feedback">
-            <input id="ckpasswd" type="password" class="form-control" placeholder="Confirm password">
-            <span class="fa fa-fw fa-lock form-control-feedback"></span>
-        </div>
-        <div class="form-group has-feedback">
-            <input id="phonenum" class="form-control" placeholder="Mobile phone no.">
-            <span class="fa fa-fw fa-mobile-phone form-control-feedback"></span>
-        </div>
-        <div class="form-group has-feedback">
-            <input id="email" class="form-control" placeholder="Email">
-            <span class="fa fa-fw fa-envelope form-control-feedback"></span>
-        </div>
-        <div class="row">
-            <div class="col-xs-8"></div>
-            <div class="col-xs-4">
-                <button id="registerSubmit" class="btn btn-primary btn-block btn-flat">注册</button>
-            </div>
-        </div>
+    <div class="form-group has-feedback">
+      <input id="username" class="form-control" placeholder="Username">
+      <span class="fa fa-fw fa-user form-control-feedback"></span>
     </div>
+    <div class="form-group has-feedback">
+      <input id="passwd" type="password" class="form-control" placeholder="Password">
+      <span class="fa fa-fw fa-lock form-control-feedback"></span>
+    </div>
+    <div class="form-group has-feedback">
+      <input id="ckpasswd" type="password" class="form-control" placeholder="Confirm password">
+      <span class="fa fa-fw fa-lock form-control-feedback"></span>
+    </div>
+    <div class="form-group has-feedback">
+      <input id="phonenum" class="form-control" placeholder="Mobile phone no.">
+      <span class="fa fa-fw fa-mobile-phone form-control-feedback"></span>
+    </div>
+    <div class="form-group has-feedback">
+      <input id="email" class="form-control" placeholder="Email">
+      <span class="fa fa-fw fa-envelope form-control-feedback"></span>
+    </div>
+    <div class="row">
+      <div class="col-xs-8"></div>
+      <div class="col-xs-4">
+        <button id="registerSubmit" class="btn btn-primary btn-block btn-flat">注册</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/static/tools/checkinput.js"></script>
 <script>
-    // 注册提交
-    $("#registerSubmit").on("click",function(){
-      username = $("#username").val();
-      passwd = $("#passwd").val();
-      ckpasswd = $("#ckpasswd").val();
-      phonenum = $("#phonenum").val();
-      email = $("#email").val();
-      console.log(username, passwd);
-      if (username == "" || passwd == "" || ckpasswd == "" || phonenum == "" || email == ""){
-          alert("以上均为必填项，请重新输入")
-      }else if (ckpasswd != passwd) {
-          alert("两次输入的密码不一致，请重新输入");
-          document.getElementById("passwd").value = "";
-          document.getElementById("ckpasswd").value = "";
-      }else {
-          url = "/resetpasswd";
-          $.post(url,{"username":username, "passwd":passwd},function(data){
-              code = data["code"];
-              if (code == 200){
-                  url = data["url"];
-                  window.location.href = url
-              }else{
-                  msg = data["msg"];
-                  $("#resetMsg").html(msg)
-              }
-          },"json")
-      }
-    });
-
-    // 回车提交
-    document.onkeydown = function(){
-        const e = event || window.event;
-        if (e.keyCode == 13){
-            $("#registerSubmit").click();
-			return false;
+  // 提交
+  $("#registerSubmit").on("click",function(){
+    username = $("#username").val();
+    passwd = $("#passwd").val();
+    ckpasswd = $("#ckpasswd").val();
+    phonenum = $("#phonenum").val();
+    email = $("#email").val();
+    console.log(username, passwd, phonenum, email);
+    if (username == "" || passwd == "" || ckpasswd == "" || phonenum == "" || email == ""){
+      alert("以上均为必填项，请重新输入")
+    }else if (ckpasswd != passwd){
+      alert("两次输入的密码不一致，请重新输入");
+      document.getElementById("passwd").value = "";
+      document.getElementById("ckpasswd").value = "";
+    }else if (!checkPhone(phonenum) || !checkEmail(email)){
+      alert("手机号码或邮箱不正确，请重新输入")
+    }else {
+      url = "/register";
+      $.post(url,{"username":username, "passwd":passwd, "phonenum":phonenum, "email":email},function(data){
+        code = data["code"];
+        if (code == 200){
+          url = data["url"];
+          window.location.href = url
+        }else {
+          msg = data["msg"];
+          $("#registerMsg").html(msg)
         }
-    };
+      },"json")
+    }
+  });
+
+  //回车提交
+  document.onkeydown = function(){
+    const e = event || window.event;
+    if (e.keyCode == 13){
+      $("#checkrecord").click();
+      return false;
+    }
+  };
 </script>
 </body>
 </html>

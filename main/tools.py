@@ -1,6 +1,7 @@
-#coding:utf-8
-import logging
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
+import hashlib, logging
 from django.http.response import HttpResponseRedirect
 
 logger = logging.getLogger("default")
@@ -17,3 +18,9 @@ class LoginCheck():
             host = request.get_host()
             uri = request.get_full_path()
             return HttpResponseRedirect('http://dtree.pe.dapp.com/login?uri=http://%s%s' % (host,uri))
+
+# md5加密
+def enpasswd(ps):
+    md5 = hashlib.md5(bytes('adc'.encode('utf-8')))
+    md5.update(bytes(ps.encode('utf-8')))
+    return md5.hexdigest()
