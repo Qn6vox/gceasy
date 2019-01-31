@@ -31,7 +31,6 @@
   </div>
   <div class=register-box-body>
     <p class=register-box-msg id="registerMsg">Sign up to JVM system</p>
-
     <div class="form-group has-feedback">
       <input id="username" class="form-control" placeholder="Username">
       <span class="fa fa-fw fa-user form-control-feedback"></span>
@@ -74,23 +73,28 @@
     email = $("#email").val();
     console.log(username, passwd, phonenum, email);
     if (username == "" || passwd == "" || ckpasswd == "" || phonenum == "" || email == ""){
-      alert("以上均为必填项，请重新输入")
+      $("#registerMsg").html("注册信息均为必填项，请重新输入");
     }else if (ckpasswd != passwd){
-      alert("两次输入的密码不一致，请重新输入");
+      $("#registerMsg").html("两次输入的密码不一致，请重新输入");
       document.getElementById("passwd").value = "";
       document.getElementById("ckpasswd").value = "";
-    }else if (!checkPhone(phonenum) || !checkEmail(email)){
-      alert("手机号码或邮箱不正确，请重新输入")
+    }else if (!checkPhone(phonenum)){
+      $("#registerMsg").html("手机号码格式不正确，请重新输入");
+      document.getElementById("phonenum").value = "";
+    }else if (!checkEmail(email)){
+      $("#registerMsg").html("邮箱格式不正确，请重新输入");
+      document.getElementById("email").value = "";
     }else {
       url = "/register";
-      $.post(url,{"username":username, "passwd":passwd, "phonenum":phonenum, "email":email},function(data){
+      $.post(url, {"username":username, "passwd":passwd, "phonenum":phonenum, "email":email}, function(data){
         code = data["code"];
         if (code == 200){
           url = data["url"];
           window.location.href = url
         }else {
           msg = data["msg"];
-          $("#registerMsg").html(msg)
+          $("#registerMsg").html(msg);
+          document.getElementById("username").value = "";
         }
       },"json")
     }

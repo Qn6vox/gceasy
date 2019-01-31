@@ -47,7 +47,6 @@ def login(request):
 
     return HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
 
-
 # 登出
 def logout(request):
     request.session["logged"] = False
@@ -72,9 +71,10 @@ def register(request):
         code = 200
         msg = "注册成功，请登录"
         url = "/login"
+    logger.info(str(username) + " " + str(msg))
     return HttpResponse(json.dumps({"code": code, "msg": msg, "url": url}))
 
-# 找回密码
+# 重置密码
 def resetpasswd(request):
     return render_to_response("resetpasswd.html")
 

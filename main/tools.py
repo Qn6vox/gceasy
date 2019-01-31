@@ -8,7 +8,7 @@ import hashlib
 class LoginCheck(object):
     def process_request(self,request):
         url = request.get_full_path()
-        if not (url.startswith("/login") or url.startswith("/get") or url == "/hostCollectionApi"):
+        if not (url.startswith("/login") or url.startswith("/register") or url == "/resetpasswd"):
             logged = request.session.get("logged",False)
             if not logged:
                 redirect = "/login?url=%s" % url

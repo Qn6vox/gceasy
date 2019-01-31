@@ -1,4 +1,6 @@
-#coding:utf-8
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
 from django.db import models
 
 class Users(models.Model):

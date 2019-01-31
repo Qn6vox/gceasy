@@ -31,7 +31,6 @@
   </div>
   <div class="login-box-body">
     <p class="login-box-msg" id="loginMsg">Sign in to start your session</p>
-
     <div class="form-group has-feedback">
       <input id="username" class="form-control" placeholder="Username">
       <span class="fa fa-fw fa-user form-control-feedback"></span>
@@ -60,14 +59,16 @@
     passwd = $("#passwd").val();
     console.log(username, passwd);
     url = "/login";
-    $.post(url,{"username":username, "passwd":passwd},function(data){
+    $.post(url, {"username":username, "passwd":passwd}, function(data){
       code = data["code"];
       if (code == 200){
         url = data["url"];
         window.location.href = url
       }else {
         msg = data["msg"];
-        $("#loginMsg").html(msg)
+        $("#loginMsg").html(msg);
+        document.getElementById("username").value = "";
+        document.getElementById("passwd").value = "";
       }
     },"json")
   });

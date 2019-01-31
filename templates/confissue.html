@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <div class="box">
   <div class="box-header">
     <h3 class="box-title">机器列表</h3>
@@ -39,7 +41,7 @@
     }else {
       url = "/issue";
       $("#loadingwait").show();
-      $.post(url,{"iplist":iplist, "appname":appname},function(data){
+      $.post(url, {"iplist":iplist, "appname":appname}, function(data){
         $("#loadingwait").hide();
         alert(data)
       });
@@ -47,3 +49,4 @@
     }
   });
 </script>
+</html>

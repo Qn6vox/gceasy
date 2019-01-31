@@ -83,7 +83,7 @@
       alert("手机号码或邮箱不正确，请重新输入")
     }else {
       url = "/register";
-      $.post(url,{"username":username, "passwd":passwd, "phonenum":phonenum, "email":email},function(data){
+      $.post(url, {"username":username, "passwd":passwd, "phonenum":phonenum, "email":email}, function(data){
         code = data["code"];
         if (code == 200){
           url = data["url"];
