@@ -5,8 +5,9 @@ from django.shortcuts import render_to_response
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
 from models import Users, Record
-from tools import enpasswd
+from tools import enpasswd, captcha
 from ldapUtils import ldapLogin
+from sendMail import sendMail
 import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
@@ -65,7 +66,7 @@ def register(request):
         Users.objects.get(name=username)
         code = 500
         msg = "用户名已被注册，请重新注册"
-        url = "/register"
+        url = ""
     except Users.DoesNotExist:
         Users(name=username, password=enpasswd(passwd), phonenum=phonenum, email=email).save()
         code = 200
@@ -77,6 +78,41 @@ def register(request):
 # 重置密码
 def resetpasswd(request):
     return render_to_response("resetpasswd.html")
+
+def sendcode(request):
+    username = request.POST.get("username", "")
+    email = request.POST.get("email", "")
+    code = 500
+    vecode = captcha(5)
+    request.session["vecode"] = vecode
+    try:
+        Users.objects.get(name=username, email=email)
+        sendMail([email], "重置密码验证码", vecode)
+        code = 200
+        msg = "验证码已发送至邮箱"
+    except Users.DoesNotExist:
+        msg = "验证信息错误，请重新输入"
+    logger.info(str(email) + " " + str(msg))
+    return HttpResponse(json.dumps({"code": code, "msg": msg}))
+
+def resetSubmit(request):
+    username = request.POST.get("username", "")
+    ckcode = request.POST.get("captcha", "")
+    passwd = request.POST.get("passwd", "")
+    code = 500
+    vecode = request.session.get("vecode", "")
+    if ckcode == vecode:
+        user = Users.objects.get(name=username)
+        user.password = enpasswd(passwd)
+        user.save()
+        code = 200
+        msg = "密码重置成功，请重新登录"
+        url = "/login"
+    else:
+        msg = "验证码错误，请重新输入"
+        url = ""
+    logger.info(str(username) + " " + str(msg))
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "url": url}))
 
 # 首页
 def index(request):

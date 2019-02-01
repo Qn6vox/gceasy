@@ -5,9 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>登录页面</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css" />
   <link rel="icon" href="/static/ico/favicon.ico" />
 
 <style>
@@ -61,12 +61,10 @@
     url = "/login";
     $.post(url, {"username":username, "passwd":passwd}, function(data){
       code = data["code"];
-      if (code == 200){
-        url = data["url"];
-        window.location.href = url
+      if (code === 200){
+        window.location.href = data["url"]
       }else {
-        msg = data["msg"];
-        $("#loginMsg").html(msg);
+        $("#loginMsg").html(data["msg"]);
         document.getElementById("username").value = "";
         document.getElementById("passwd").value = "";
       }
@@ -76,7 +74,7 @@
   //回车提交
   document.onkeydown = function(){
     const e = event || window.event;
-    if (e.keyCode == 13){
+    if (e.keyCode === 13){
       $("#loginSubmit").click();
       return false;
     }

@@ -5,9 +5,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>注册页面</title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css" />
   <link rel="icon" href="/static/ico/favicon.ico" />
 
 <style>
@@ -71,10 +71,9 @@
     ckpasswd = $("#ckpasswd").val();
     phonenum = $("#phonenum").val();
     email = $("#email").val();
-    console.log(username, passwd, phonenum, email);
-    if (username == "" || passwd == "" || ckpasswd == "" || phonenum == "" || email == ""){
+    if (username === "" || passwd === "" || ckpasswd === "" || phonenum === "" || email === ""){
       $("#registerMsg").html("注册信息均为必填项，请重新输入");
-    }else if (ckpasswd != passwd){
+    }else if (ckpasswd !== passwd){
       $("#registerMsg").html("两次输入的密码不一致，请重新输入");
       document.getElementById("passwd").value = "";
       document.getElementById("ckpasswd").value = "";
@@ -88,12 +87,11 @@
       url = "/register";
       $.post(url, {"username":username, "passwd":passwd, "phonenum":phonenum, "email":email}, function(data){
         code = data["code"];
-        if (code == 200){
-          url = data["url"];
-          window.location.href = url
+        if (code === 200){
+          alert(data["msg"]);
+          window.location.href = data["url"]
         }else {
-          msg = data["msg"];
-          $("#registerMsg").html(msg);
+          $("#registerMsg").html(data["msg"]);
           document.getElementById("username").value = "";
         }
       },"json")
@@ -103,7 +101,7 @@
   //回车提交
   document.onkeydown = function(){
     const e = event || window.event;
-    if (e.keyCode == 13){
+    if (e.keyCode === 13){
       $("#registerSubmit").click();
       return false;
     }

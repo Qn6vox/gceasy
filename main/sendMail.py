@@ -5,8 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-
-def send_mail(receivers, sub, content, ct='plain', attach=None):
+def sendMail(receivers, sub, content, ct='plain', attach=None):
     mailhost = "dwmail.dangdang.com"
     mailuser = "ddop"
     mailpass = "5GxIQSdGcV"

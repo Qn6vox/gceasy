@@ -36,7 +36,7 @@
   $("#issue").on("click",function(){
     iplist = $("#iplist").val().trim();
     appname = $("#appname").val().trim();
-    if (iplist  == "" || appname == ""){
+    if (iplist === "" || appname === ""){
       alert("请输入机器IP和应用名称")
     }else {
       url = "/issue";

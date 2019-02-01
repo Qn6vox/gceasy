@@ -59,7 +59,7 @@
 	appname = $("#appname").val().trim();
 	starttime = $("#starttime").val().trim();
 	endtime = $("#endtime").val().trim();
-    if (targetip == "" || appname == ""){
+    if (targetip === "" || appname === ""){
 	  alert("请输入目标机器IP和应用名称")
     }else if (starttime > endtime){
       alert("开始时间必须小于结束时间")
@@ -69,7 +69,7 @@
       $.get(url,function(data){
         code = data["code"];
         $("#loadingwait").hide();
-        if (code == 200){
+        if (code === 200){
           reporturl = data["reporturl"];
           result = data["result"];
           //展示返回数据
@@ -87,7 +87,7 @@
   //回车提交
   document.onkeydown = function(){
     const e = event || window.event;
-    if (e.keyCode == 13){
+    if (e.keyCode === 13){
       $("#analyze").click();
       return false;
     }
