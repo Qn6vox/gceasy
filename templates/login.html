@@ -58,17 +58,22 @@
     username = $("#username").val();
     passwd = $("#passwd").val();
     console.log(username, passwd);
-    url = "/login";
-    $.post(url, {"username":username, "passwd":passwd}, function(data){
-      code = data["code"];
-      if (code === 200){
-        window.location.href = data["url"]
-      }else {
-        $("#loginMsg").html(data["msg"]);
-        document.getElementById("username").value = "";
-        document.getElementById("passwd").value = "";
-      }
-    },"json")
+    if (username === "" || passwd === ""){
+      $("#loginMsg").html("用户名或密码不能为空，请重新输入");
+    }else {
+      url = "/login";
+      $.post(url, {"username":username, "passwd":passwd}, function(data){
+        code = data["code"];
+        if (code === 200){
+          window.location.href = data["url"]
+        }else {
+          $("#loginMsg").html(data["msg"]);
+          document.getElementById("username").value = "";
+          document.getElementById("passwd").value = "";
+        }
+      },"json")
+    }
+
   });
 
   //回车提交

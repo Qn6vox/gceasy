@@ -8,7 +8,7 @@ import hashlib, random
 class LoginCheck(object):
     @staticmethod
     def process_request(request):
-        cklist = ["register", "resetpasswd", "sendcode", "resetSubmit"]
+        cklist = ["/register", "/resetpasswd", "/sendcode", "/resetSubmit"]
         url = request.get_full_path()
         if not (url.startswith("/login") or url in cklist):
             logged = request.session.get("logged",False)
