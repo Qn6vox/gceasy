@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 def sendMail(receivers, sub, content, ct='plain', attach=None):
     mailhost = "dwmail.dangdang.com"
     mailuser = "ddop"
-    mailpass = "5GxIQSdGcV"
+    mailpass = "*"
     mailpostfix = "dangdang.com"
     me = "hello" + "<" + mailuser + "@" + mailpostfix + ">"
     msg = MIMEText(content, _subtype=ct, _charset='utf-8')
