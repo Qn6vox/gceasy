@@ -1,36 +1,59 @@
+<!DOCTYPE html>
+<html>
 <div class="box">
-	<div class="box-header">
-		<h3 class="box-title">机器列表</h3>
-	</div>
-	<div class="box-body">
-        <div class="modal-body">
-            <textarea id="iplist" class="form-control" rows="5" style="resize:none" placeholder="多个关键词"></textarea>
-        </div>
-		<div class="col-md-2">
-			<button class="btn btn-info btn-sm" id="issue">分发</button>
-		</div>
-	</div>
+  <div class="box-header">
+    <h3 class="box-title">机器列表</h3>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="modal-body">
+        <textarea id="iplist" class="form-control" rows="5" style="resize:none" placeholder="可写入多个IP"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="box-header">
+    <h3 class="box-title">应用名称</h3>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="col-md-2">
+        <input type="text" class="form-control" id="appname">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-info btn-sm" id="issue">分发</button>
+      </div>
+    </div>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="modal-body" style="font-size: 18px">
+          <a href="http://git.dangdang.com/wanghuaizhi/jms/wikis/%E9%85%8D%E7%BD%AE%E5%88%86%E5%8F%91%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E" target="_blank">使用说明</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    //控制PageHeader
-    $("#pageheader").html($(".treeview-menu .active").children("a").html())
-    //控制<请稍等>
-    $("#loadingwait").hide();
+  //控制PageHeader
+  $("#pageheader").html($(".treeview-menu .active").children("a").html());
+  //控制<请稍等>
+  $("#loadingwait").hide();
 
-	//提交机器列表
-	$("#issue").on("click",function(){
-		iplist = $("#iplist").val().trim();
-        if (iplist == ""){
-		    alert("请输入机器IP")
-        }else {
-		    url = "/issue"
-            $("#loadingwait").show();
-            $.post(url,{"iplist":iplist},function (data) {
-                $("#loadingwait").hide();
-                alert(data)
-            })
-            $(this).blur()
-        }
-	})
+  //提交机器列表
+  $("#issue").on("click",function(){
+    iplist = $("#iplist").val().trim();
+    appname = $("#appname").val().trim();
+    if (iplist === "" || appname === ""){
+      alert("请输入机器IP和应用名称")
+    }else {
+      url = "/issue";
+      $("#loadingwait").show();
+      $.post(url, {"iplist":iplist, "appname":appname}, function(data){
+        $("#loadingwait").hide();
+        alert(data)
+      });
+      $(this).blur()
+    }
+  });
 </script>
+</html>

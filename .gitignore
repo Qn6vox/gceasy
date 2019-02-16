@@ -1,5 +1,5 @@
 .idea
-test
+.settings
 venv
 *.log
 *.pyc

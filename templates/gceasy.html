@@ -1,67 +1,96 @@
+<!DOCTYPE html>
+<html>
 <script src="/static/bootstrap_datepicker/js/bootstrap-datepicker.js"></script>
-<script src="/static/tools/formatjson.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/bootstrap_datepicker/css/bootstrap-datepicker.css" />
 
 <div class="box">
-    <div class="box-header">
-		<h3 class="box-title">选取时间段</h3>
-	</div>
-    <div class="box-body">
-        <div class="input-group input-daterange col-md-3">
-            <input type="text" class="form-control" id="starttime" />
-            <span class="input-group-addon">to</span>
-            <input type="text" class="form-control" id="endtime" />
-        </div>
+  <div class="box-header">
+    <h3 class="box-title">选取时间段</h3>
+  </div>
+  <div class="box-body">
+    <div class="input-group input-daterange col-md-3">
+      <input type="text" class="form-control" id="starttime">
+      <span class="input-group-addon">to</span>
+      <input type="text" class="form-control" id="endtime">
     </div>
-	<div class="box-header">
-		<h3 class="box-title">目标IP</h3>
-	</div>
-	<div class="box-body">
-		<div class="col-md-2">
-			<input type="text" class="form-control" id="targetip">
-		</div>
-		<div class="col-md-2">
-			<button class="btn btn-info btn-sm" id="analyze">分析</button>
-		</div>
-	</div>
+  </div>
+  <div class="box-header">
+    <h3 class="box-title">目标IP</h3>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="col-md-2">
+        <input type="text" class="form-control" id="targetip">
+      </div>
+    </div>
+  </div>
+  <div class="box-header">
+    <h3 class="box-title">应用名称</h3>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="col-md-2">
+        <input type="text" class="form-control" id="appname">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-info btn-sm" id="analyze">分析</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <pre id="Canvas" class="Canvas well resizable" style="height:100%;overflow:auto;margin-bottom:0px;"></pre>
 
+<script src="/static/tools/formatjson.js"></script>
 <script>
-    //控制PageHeader
-    $("#pageheader").html($(".treeview-menu .active").children("a").html())
-    //控制<请稍等>
-    $("#loadingwait").hide();
+  //控制PageHeader
+  $("#pageheader").html($(".treeview-menu .active").children("a").html());
+  //控制<请稍等>
+  $("#loadingwait").hide();
 
-    //日期插件
-    $('.input-daterange input').each(function() {
-        $(this).datepicker('clearDates');
-    })
+  //日期插件
+  $('.input-daterange input').each(function(){
+    $(this).datepicker('clearDates');
+  });
 
-	//提交分析
-	$("#analyze").on("click",function(){
-		targetip = $("#targetip").val().trim();
-        if (targetip == ""){
-		    alert("请输入目标机器IP")
+  //提交分析
+  $("#analyze").on("click",function(){
+    targetip = $("#targetip").val().trim();
+	appname = $("#appname").val().trim();
+	starttime = $("#starttime").val().trim();
+	endtime = $("#endtime").val().trim();
+    if (targetip === "" || appname === ""){
+	  alert("请输入目标机器IP和应用名称")
+    }else if (starttime > endtime){
+      alert("开始时间必须小于结束时间")
+    }else {
+      url = "/analyze?targetip="+targetip+"&appname="+appname+"&starttime="+starttime+"&endtime="+endtime;
+      $("#loadingwait").show();
+      $.get(url,function(data){
+        code = data["code"];
+        $("#loadingwait").hide();
+        if (code === 200){
+          reporturl = data["reporturl"];
+          result = data["result"];
+          //展示返回数据
+          $("#Canvas").html(formatJson(result));
+          //浏览器新tab页访问截取的url
+          window.open(reporturl)
         }else {
-		    url = "/analyze?targetip="+targetip;
-            $("#loadingwait").show();
-            $.get(url,function (data) {
-                code = data["code"];
-                $("#loadingwait").hide();
-                if (code == 200){
-                    reporturl = data["reporturl"];
-                    result = data["result"];
-                    //展示返回数据
-                    $("#Canvas").html(formatJson(result));
-                    //浏览器新tab页访问截取的url
-                    window.open(reporturl)
-                }else {
-                    alert(data["msg"])
-                }
-            },"json")
-            $(this).blur()
+          alert(data["msg"])
         }
-	})
+      },"json");
+      $(this).blur()
+    }
+  });
+
+  //回车提交
+  document.onkeydown = function(){
+    const e = event || window.event;
+    if (e.keyCode === 13){
+      $("#analyze").click();
+      return false;
+    }
+  };
 </script>
+</html>
