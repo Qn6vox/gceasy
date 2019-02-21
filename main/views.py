@@ -171,6 +171,7 @@ def searchapp(request):
     code = 200
     msg = ""
     ip = request.GET.get("targetip").strip()
+    os.system("ssh -o StrictHostKeyChecking=no root@%s" % ip)
     getapp = "ssh -o StrictHostKeyChecking=no root@%s \"ls -l /usr/local | grep tomcat* | awk '{print \$9}'\"" % ip
     status, result = commands.getstatusoutput(getapp)
     if status:
