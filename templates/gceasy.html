@@ -29,10 +29,10 @@
   </div>
   <div class="box-body">
     <div class="row">
-      <div class="col-md-2">
-        <input type="text" class="form-control" id="appname">
+      <div class="col-md-2" style="width: 250px" >
+        <select class="form-control" id="appname" onclick="searchapp()"></select>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-2" style="margin-top: 2px">
         <button class="btn btn-info btn-sm" id="analyze">分析</button>
       </div>
     </div>
@@ -42,6 +42,8 @@
 <pre id="Canvas" class="Canvas well resizable" style="height:100%;overflow:auto;margin-bottom:0px;"></pre>
 
 <script src="/static/tools/formatjson.js"></script>
+<script src="/static/js/jquery.combo.select.js"></script>
+<link rel="stylesheet" href="/static/css/combo.select.css">
 <script>
   //控制PageHeader
   $("#pageheader").html($(".treeview-menu .active").children("a").html());
@@ -52,6 +54,31 @@
   $('.input-daterange input').each(function(){
     $(this).datepicker('clearDates');
   });
+
+  //获取服务器应用列表
+  function searchapp(){
+    targetip = $("#targetip").val().trim();
+    if (targetip === ""){
+      alert("请输入目标机器IP")
+    }else {
+      url = "/searchapp?targetip="+targetip;
+      //$("#info").load(url);
+      $("#appname").comboSelect();
+      $.get(url,function(data) {
+        code = data["code"];
+        if (code === 200){
+          applist = data["applist"];
+          $("#appname").empty();
+            $.each(applist,function(index, app){
+                $("#appname").append("<option>"+app+"</option>")
+            });
+          $("#appname").comboSelect();
+        }else {
+          alert(data["msg"])
+        }
+      },"json");
+    }
+  }
 
   //提交分析
   $("#analyze").on("click",function(){
