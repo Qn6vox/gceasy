@@ -167,6 +167,22 @@ def issue(request):
 def gceasy(request):
     return render_to_response("gceasy.html")
 
+def searchapp(request):
+    code = 200
+    msg = ""
+    ip = request.GET.get("targetip").strip()
+    os.system("ssh -o StrictHostKeyChecking=no root@%s" % ip)
+    getapp = "ssh -o StrictHostKeyChecking=no root@%s \"ls -l /usr/local |awk '{print \$9}' |grep \"tomcat*\"\"" % ip
+    status, result = commands.getstatusoutput(getapp)
+    if status:
+        code = 500
+        msg = "Error: Get applist falied."
+    applist = []
+    for app in result.split():
+        applist.append(app)
+    logger.info(str(ip) + " -- applist=" + str(applist))
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "applist":applist}))
+
 def analyze(request):
     code = 500
     msg, result, reporturl = "", "", ""
