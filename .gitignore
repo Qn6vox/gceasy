@@ -1,6 +1,5 @@
 .idea
 .settings
 venv
-README.md
 *.log
 *.pyc
