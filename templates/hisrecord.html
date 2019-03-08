@@ -55,7 +55,9 @@
   //控制<请稍等>
   $("#loadingwait").hide();
   //Table样式
-  $('#recordTable').DataTable();
+  $('#recordTable').DataTable({
+    "order":[[1, "desc"]]
+  });
 
   //日期插件
   $('.input-daterange input').each(function(){
