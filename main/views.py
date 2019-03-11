@@ -150,7 +150,7 @@ def issue(request):
     q = Queue.Queue()
     iplist = request.POST.get("iplist").strip()
     appname = request.POST.get("appname").strip()
-    ips = re.split("[,|;|\t|\n]", iplist)
+    ips = re.split("[,;\t\n ]", iplist)
     logger.info(ips)
     for ip in ips:
         t = threading.Thread(target=sync, args=[ip, q, appname])
