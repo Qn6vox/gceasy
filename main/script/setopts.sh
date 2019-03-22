@@ -13,7 +13,7 @@ LOGDIR="$LOGPATH/gclog"
 [ ${LOGDIR} ] && mkdir -p $LOGDIR
 
 # check java version
-JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+JAVA_VERSION=`java -version 2>&1 | awk -F '"' '/version/ {print $2}'`
 
 # Enable coredump
 ulimit -c unlimited
@@ -69,11 +69,6 @@ GC_OPTS="$GC_OPTS -XX:+ExplicitGCInvokesConcurrent"
 ## GC log Options, only for JDK7/JDK8 ##
 LOGFILE=${LOGDIR}/gc-${APPNAME}.log
 
-#if [ -f ${LOGFILE} ]; then
-#    LOGBACKUP=${LOGDIR}/gc-${APPNAME}-$(date +'%Y%m%d%H%M').log
-#    mv ${LOGFILE} ${LOGBACKUP}
-#fi
-
 # 打印GC日志，包括时间戳，晋升老生代失败原因，应用实际停顿时间(含GC及其他原因)
 GCLOG_OPTS="-Xloggc:${LOGFILE} -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintPromotionFailure -XX:+PrintGCApplicationStoppedTime"
 
@@ -126,17 +121,20 @@ JMX_OPTS="-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.po
 
 ## All together ##
 OPTS="JAVA_OPTS=\"$MEM_OPTS $GC_OPTS $GCLOG_OPTS $OPTIMIZE_OPTS $JMX_OPTS\""
-echo $OPTS > $CONFDIR/iniconfig.log
+echo $OPTS > $CONFDIR/setopts.log
 
 # 修改应用启动脚本
 SHFILE="/usr/local/$APPNAME/bin/catalina.sh"
-if [[ -z `grep "Xloggc" $SHFILE` ]];then
+if [[ -z `grep "JAVA_OPTS=\"-" $SHFILE` ]];then
+    sed -i "3a\\$OPTS" $SHFILE
+else
+    sed -i '/JAVA_OPTS=\"-/d' $SHFILE
     sed -i "3a\\$OPTS" $SHFILE
 fi
 
 # 修改配置文件的日志路径
-GCLOGFILE=`awk '/Xloggc/ {print}' $SHFILE | awk -F "-Xloggc:" '{print $2}' | awk '{print $1}'`
-echo $GCLOGFILE >> $CONFDIR/iniconfig.log
+GCLOGFILE=`awk '/Xloggc/ {print}' $SHFILE | awk -F '-Xloggc:' '{print $2}' | awk -F'[ "]' '{print $1}'`
+echo $GCLOGFILE >> $CONFDIR/setopts.log
 
 CONFFILE="$CONFDIR/logpath.conf"
 if [[ -z `grep "path" $CONFFILE` ]];then
