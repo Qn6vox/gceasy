@@ -6,7 +6,7 @@ CONFDIR="/root/gceasy/$APPNAME"
 
 JOBLOG=`cat /usr/local/nginx/conf/sites-e*/joblog.conf | grep alias | grep -v "#"`
 if [ $? != 0 ];then
-	JOBLOG=`cat /usr/local/nginx/conf/sites-a*/joblog.conf | grep alias | grep -v "#"`
+    JOBLOG=`cat /usr/local/nginx/conf/sites-a*/joblog.conf | grep alias | grep -v "#"`
 fi
 LOGPATH=`echo $JOBLOG | awk '{print $2}' | awk -F ";" '{print $1}' | sed 's/.$//'`
 LOGDIR="$LOGPATH/gclog"
@@ -22,9 +22,9 @@ ulimit -c unlimited
 MEM_OPTS="-Xms2g -Xmx4g -XX:NewRatio=1"
 
 if [[ "$JAVA_VERSION" < "1.8" ]]; then
-	MEM_OPTS="$MEM_OPTS -XX:PermSize=128m -XX:MaxPermSize=512m"
+    MEM_OPTS="$MEM_OPTS -XX:PermSize=128m -XX:MaxPermSize=512m"
 else
-	MEM_OPTS="$MEM_OPTS -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m"
+    MEM_OPTS="$MEM_OPTS -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m"
 fi
 
 # 启动时预申请内存
@@ -63,15 +63,15 @@ GC_OPTS="$GC_OPTS -XX:+ExplicitGCInvokesConcurrent"
 
 # 如果永久代使用不会增长，关闭CMS时ClassUnloading，降低CMS GC时出现缓慢的几率
 #if [[ "$JAVA_VERSION" > "1.8" ]]; then
-#	GC_OPTS="$GC_OPTS -XX:-CMSClassUnloadingEnabled"
+#    GC_OPTS="$GC_OPTS -XX:-CMSClassUnloadingEnabled"
 #fi
 
 ## GC log Options, only for JDK7/JDK8 ##
 LOGFILE=${LOGDIR}/gc-${APPNAME}.log
 
 #if [ -f ${LOGFILE} ]; then
-#	LOGBACKUP=${LOGDIR}/gc-${APPNAME}-$(date +'%Y%m%d%H%M').log
-#	mv ${LOGFILE} ${LOGBACKUP}
+#    LOGBACKUP=${LOGDIR}/gc-${APPNAME}-$(date +'%Y%m%d%H%M').log
+#    mv ${LOGFILE} ${LOGBACKUP}
 #fi
 
 # 打印GC日志，包括时间戳，晋升老生代失败原因，应用实际停顿时间(含GC及其他原因)
@@ -79,7 +79,7 @@ GCLOG_OPTS="-Xloggc:${LOGFILE} -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+P
 
 # 打印GC原因，JDK8默认打开
 if [[ "$JAVA_VERSION" < "1.8" ]]; then
-	GCLOG_OPTS="$GCLOG_OPTS -XX:+PrintGCCause"
+    GCLOG_OPTS="$GCLOG_OPTS -XX:+PrintGCCause"
 fi
 
 # 打印GC前后的各代大小
@@ -102,7 +102,7 @@ OPTIMIZE_OPTS="-XX:-UseBiasedLocking -XX:AutoBoxCacheMax=20000 -Djava.security.e
 
 # 关闭多层编译，减少应用刚启动时的JIT导致的可能超时，以及避免部分函数C1编译后最终没被C2编译，但导致函数没有被初始C1编译
 #if [[ "$JAVA_VERSION" > "1.8" ]]; then
-#	OPTIMIZE_OPTS="$OPTIMIZE_OPTS -XX:-TieredCompilation"
+#    OPTIMIZE_OPTS="$OPTIMIZE_OPTS -XX:-TieredCompilation"
 #fi
 
 # 如果希望无论函数的热度如何，最终JIT所有函数，关闭GC时将函数调用次数减半
@@ -126,15 +126,17 @@ JMX_OPTS="-Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.po
 
 ## All together ##
 OPTS="JAVA_OPTS=\"$MEM_OPTS $GC_OPTS $GCLOG_OPTS $OPTIMIZE_OPTS $JMX_OPTS\""
-echo $OPTS
+echo $OPTS > $CONFDIR/iniconfig.log
 
+# 修改应用启动脚本
 SHFILE="/usr/local/$APPNAME/bin/catalina.sh"
 if [[ -z `grep "Xloggc" $SHFILE` ]];then
     sed -i "3a\\$OPTS" $SHFILE
 fi
 
+# 修改配置文件的日志路径
 GCLOGFILE=`awk '/Xloggc/ {print}' $SHFILE | awk -F "-Xloggc:" '{print $2}' | awk '{print $1}'`
-echo $GCLOGFILE > $CONFDIR/iniconfig.log
+echo $GCLOGFILE >> $CONFDIR/iniconfig.log
 
 CONFFILE="$CONFDIR/logpath.conf"
 if [[ -z `grep "path" $CONFFILE` ]];then
@@ -143,5 +145,6 @@ else
     sed -i "s!^path.*!path=$GCLOGFILE!" $CONFFILE
 fi
 
+# 配置计划任务，定时执行
 echo "1 3 * * * /usr/bin/python $CONFDIR/sendmail.py >> $CONFDIR/crontab.log" >> /var/spool/cron/root
 /etc/init.d/crond reload > /dev/null 2>&1
