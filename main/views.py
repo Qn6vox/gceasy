@@ -134,7 +134,7 @@ def sync(ip, q, appname):
         code = 500
         msg = "Error: Rsync conf is failed."
     else:
-        shcmd = 'ssh -o StrictHostKeyChecking=no root@%s "/bin/sh %s/iniconfig.sh %s"' % (ip, propath, appname)
+        shcmd = 'ssh -o StrictHostKeyChecking=no root@%s "/bin/sh %s/setops.sh %s"' % (ip, propath, appname)
         status, shres = commands.getstatusoutput(shcmd)
         logger.info(str(shcmd) + " -- code:" + str(status))
         if status:
