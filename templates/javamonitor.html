@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<div class="box">
+  <div class="box-header">
+    <h3 class="box-title">机器列表</h3>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="modal-body">
+        <textarea id="iplist" class="form-control" rows="5" style="resize:none" placeholder="可写入多个IP"></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="box-body">
+    <div class="row">
+      <div class="col-md-2" style="margin-top: 2px">
+        <button class="btn btn-info btn-sm" id="issue">分发</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="box">
+  <div class="box-body">
+    <div class="row">
+      <div class="modal-body" style="font-size: 18px">
+        <!--
+        <iframe src="http://10.5.19.27:8888/" width="100%" height="100%"></iframe>
+        -->
+        <a href="http://jmx.dd.com" target="_blank">监控页链接</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  //控制PageHeader
+  $("#pageheader").html($(".treeview-menu .active").children("a").html());
+  //控制<请稍等>
+  $("#loadingwait").hide();
+
+  //提交机器列表
+  $("#issue").on("click",function(){
+    iplist = $("#iplist").val().trim();
+    if (iplist === ""){
+      alert("请输入机器IP")
+    }else {
+      url = "/setagent";
+      $("#loadingwait").show();
+      $.post(url, {"iplist":iplist}, function(data){
+        $("#loadingwait").hide();
+        alert(data)
+      });
+      $(this).blur()
+    }
+  });
+</script>
+</html>

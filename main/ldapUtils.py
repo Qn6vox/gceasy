@@ -5,7 +5,7 @@ import ldap, logging
 
 logger = logging.getLogger("info")
 
-ldappath = "ldap://192.168.80.10"   #ldap服务器地址
+ldappath = "ldap://ldap.dangdang.com"   #ldap服务器地址
 baseDN = "ou=KeWenDangDang,dc=dangdang,dc=com"  #根目录
 ldapuser = "adsmart@dangdang.com"   #ldap服务器用户名
 ldappass = "sl-1234"    #ldap服务器密码
