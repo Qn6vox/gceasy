@@ -9,6 +9,7 @@ from ansible.vars.manager import VariableManager
 from ansible.inventory.manager import InventoryManager
 from ansible.playbook.play import Play
 from ansible.executor.task_queue_manager import TaskQueueManager
+from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.plugins.callback import CallbackBase
 import ansible.constants as C
 
@@ -17,46 +18,59 @@ class ResultCallback(CallbackBase):
         host = result._host
         print(json.dumps({host.name: result._result}, indent=4))
 
-def ansibleApi(hosts, module, args=""):
-    Options = namedtuple('Options', ['connection', 'module_path', 'forks', 'become', 'become_method', 'become_user', 'check', 'diff'])
-    options = Options(connection='ssh', module_path=['/to/mymodules'], forks=10, become=None, become_method=None, become_user=None, check=False, diff=False)
+class ansibleApi:
+    def __init__(self, hosts):
+        self.loader = DataLoader()
+        self.passwords = dict(vault_pass='secret')
+        self.results_callback = ResultCallback()
+        Options = namedtuple('Options', ['connection', 'module_path', 'forks', 'become', 'become_method', 'become_user', 'check', 'diff', 'listhosts', 'listtasks', 'listtags', 'syntax'])
+        self.options = Options(connection='ssh', module_path=['/to/mymodules'], forks=10, become=None, become_method=None, become_user=None, check=False, diff=False, listhosts=None, listtasks=None, listtags=None, syntax=None)
 
-    loader = DataLoader()
-    passwords = dict(vault_pass='secret')
-    results_callback = ResultCallback()
+        if isinstance(hosts, list):
+            hosts = ",".join(hosts)
+        self.inventory = InventoryManager(loader=self.loader, sources=hosts + ',')
+        self.variable_manager = VariableManager(loader=self.loader, inventory=self.inventory)
 
-    if isinstance(hosts,list):
-        hosts = ",".join(hosts)
-    inventory = InventoryManager(loader=loader, sources=hosts + ',')
-    variable_manager = VariableManager(loader=loader, inventory=inventory)
-
-    play_source =  dict(
-        name = "Ansible Play",
-        hosts = 'all',
-        gather_facts = 'no',
-        tasks = [
-            dict(action=dict(module=module, args=args), register='shell_out')
-        ]
-    )
-
-    play = Play().load(play_source, variable_manager=variable_manager, loader=loader)
-
-    tqm = None
-    try:
-        tqm = TaskQueueManager(
-            inventory=inventory,
-            variable_manager=variable_manager,
-            loader=loader,
-            options=options,
-            passwords=passwords,
-            stdout_callback=results_callback,
+    def ansible(self, module, args=""):
+        play_source = dict(
+            name = "Ansible Play",
+            hosts = 'all',
+            gather_facts = 'no',
+            tasks = [
+                dict(action=dict(module=module, args=args), register='shell_out')
+            ]
         )
-        tqm.run(play)
-    finally:
-        if tqm is not None:
-            tqm.cleanup()
 
-        shutil.rmtree(C.DEFAULT_LOCAL_TMP, True)
+        play = Play().load(play_source, variable_manager=self.variable_manager, loader=self.loader)
+
+        tqm = None
+        try:
+            tqm = TaskQueueManager(
+                inventory=self.inventory,
+                variable_manager=self.variable_manager,
+                loader=self.loader,
+                options=self.options,
+                passwords=self.passwords,
+                stdout_callback=self.results_callback
+            )
+            tqm.run(play)
+        finally:
+            if tqm is not None:
+                tqm.cleanup()
+
+            shutil.rmtree(C.DEFAULT_LOCAL_TMP, True)
+
+    def playbook(self, yamlpath):
+        pb = PlaybookExecutor(
+            playbooks=yamlpath,
+            inventory=self.inventory,
+            variable_manager=self.variable_manager,
+            loader=self.loader,
+            options=self.options,
+            passwords=self.passwords
+        )
+        pb.run()
 
 if __name__ == '__main__':
-    ansibleApi(['10.5.19.1','10.5.19.2'], "command", "touch /root/ansibletest")
+    #ansibleApi(['10.5.19.1','10.5.19.2']).ansible("command", "touch /root/ansibletest")
+    ansibleApi(['10.5.19.1','10.5.19.2']).playbook(["/etc/ansible/roles/agent.yml"])
