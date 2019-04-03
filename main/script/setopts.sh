@@ -11,6 +11,7 @@ fi
 LOGPATH=`echo $JOBLOG | awk '{print $2}' | awk -F ";" '{print $1}' | sed 's/.$//'`
 LOGDIR="$LOGPATH/gclog"
 [ ${LOGDIR} ] && mkdir -p $LOGDIR
+chown tomcat.tomcat $LOGDIR
 
 # check java version
 JAVA_VERSION=`java -version 2>&1 | awk -F '"' '/version/ {print $2}'`

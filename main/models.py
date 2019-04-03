@@ -13,7 +13,7 @@ class Users(models.Model):
     # 邮箱
     email = models.CharField(max_length=30)
     # 是否锁定
-    islock = models.IntegerField(max_length=1, default=0)
+    islock = models.IntegerField(default=0)
 
 class Record(models.Model):
     # 查询IP
