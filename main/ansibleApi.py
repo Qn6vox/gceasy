@@ -10,7 +10,6 @@ from ansible.playbook.play import Play
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.plugins.callback import CallbackBase
-from ansible.errors import AnsibleParserError
 
 class ResultCallback(CallbackBase):
     def __init__(self, * args, **kwargs):
@@ -87,28 +86,20 @@ class ansibleApi:
                 stdout_callback=self.callback
             )
             tqm.run(play)
-            status = True
-            msg = "Ansible play success."
-        except AnsibleParserError:
-            status = False
-            msg = "Ansible play failed."
         finally:
             if tqm is not None:
                 tqm.cleanup()
 
         results_raw = {'success': {}, 'failed': {}, 'unreachable': {}}
-
         for host, result in self.callback.host_ok.items():
             results_raw['success'][host] = result._result
-
         for host, result in self.callback.host_failed.items():
             results_raw['failed'][host] = result._result['msg']
-
         for host, result in self.callback.host_unreachable.items():
             results_raw['unreachable'][host] = result._result['msg']
 
         print json.dumps(results_raw, indent=4)
-        return status, msg, results_raw
+        return results_raw
 
     def playbook(self, yamlpath):
         self.variable_manager.extra_vars = {'customer': 'test', 'disabled': 'yes'}

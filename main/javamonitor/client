@@ -1,0 +1,23 @@
+#!/bin/bash
+source /etc/profile
+LOGFILE="/root/javamonitor/client.log"
+
+case "$1" in
+    start)
+    echo "Starting ... "
+    nohup java -jar /root/javamonitor/client-0.0.3-SNAPSHOT.jar > $LOGFILE 2>&1 &
+    ;;
+    stop)
+    echo "Shutting down ... "
+    /bin/ps -ef | grep client-0.0.3-SNAPSHOT.jar | grep -v grep | awk '{print $2}' | xargs kill -9
+    ;;
+    restart)
+    $0 stop
+    sleep 3
+    $0 start
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+    ;;
+esac

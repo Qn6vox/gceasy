@@ -254,14 +254,28 @@ def setagent(request):
     iplist = request.POST.get("iplist").strip()
     ips = re.split("[,;\t\n ]", iplist)
     logger.info("setagent iplist: " + str(ips))
+
+    filepath = '/data/project/javamonitor/application.properties'
+    getnum = "grep -v '#' %s | awk 'END {print}' | awk -F '[][]' '{print $2}'" % filepath
+    i = commands.getoutput(getnum)
+    for ip in ips:
+        i = int(i)+1
+        name = "monitor.serve[%s].name=%s" % (i, ip)
+        address = "monitor.serve[%s].address=http://%s:8081" % (i, ip)
+        with open(filepath, 'a') as f:
+            f.write(name+'\n')
+            f.write(address+'\n')
+            f.close()
+
     agentpath = "/data/project/gceasy/main/javamonitor"
     tgpath = "/root/javamonitor"
     ansibleApi(ips).ansible("shell", "[ %s ] && mkdir -p %s" % (tgpath, tgpath))
-    status, msg, results = ansibleApi(ips).ansible("copy", "src=%s/ dest=%s/ mode=0755" % (agentpath, tgpath))
-    #status, msg, results = ansibleApi(ips).ansible("shell", "./%s/client" % tgpath)
+    ansibleApi(ips).ansible("copy", "src=%s/ dest=%s/ mode=0755" % (agentpath, tgpath))
+    results = ansibleApi(ips).ansible("shell", "/bin/sh %s/client start" % tgpath)
+    logger.info("Ansible result: " + str(results))
     code = 500
-    logger.info("Ansible play status: " + str(status))
-    logger.info(results)
-    if status:
+    msg = "Ansible play failed."
+    if results:
         code = 200
+        msg = "Ansible play success."
     return HttpResponse(json.dumps({"code": code, "msg": msg}))

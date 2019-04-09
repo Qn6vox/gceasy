@@ -127,10 +127,10 @@ echo $OPTS > $CONFDIR/setopts.log
 # 修改应用启动脚本
 SHFILE="/usr/local/$APPNAME/bin/catalina.sh"
 if [[ -z `grep "JAVA_OPTS=\"-" $SHFILE` ]];then
-    sed -i "3a\\$OPTS" $SHFILE
+    sed -i "/Licensed/i\\$OPTS" $SHFILE
 else
     sed -i '/JAVA_OPTS=\"-/d' $SHFILE
-    sed -i "3a\\$OPTS" $SHFILE
+    sed -i "/Licensed/i\\$OPTS" $SHFILE
 fi
 
 # 修改配置文件的日志路径
