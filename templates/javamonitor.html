@@ -23,9 +23,6 @@
   <div class="box-body">
     <div class="row">
       <div class="modal-body" style="font-size: 18px">
-        <!--
-        <iframe src="http://10.5.19.27:8888/" width="100%" height="100%"></iframe>
-        -->
         <a href="http://jmx.dd.com" target="_blank">监控页链接</a>
       </div>
     </div>
@@ -47,9 +44,14 @@
       url = "/setagent";
       $("#loadingwait").show();
       $.post(url, {"iplist":iplist}, function(data){
+        code = data["code"];
         $("#loadingwait").hide();
-        alert(data)
-      });
+        if (code === 200){
+          alert(data["msg"])
+        }else {
+          alert(data["msg"])
+        }
+      },"json");
       $(this).blur()
     }
   });

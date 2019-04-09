@@ -8,6 +8,7 @@ from models import Users, Record
 from tools import enpasswd, captcha
 from ldapUtils import ldapLogin
 from sendMail import sendMail
+from ansibleApi import ansibleApi
 import commands, json, logging, os, re, threading, Queue
 
 logger = logging.getLogger("default")
@@ -151,7 +152,7 @@ def issue(request):
     iplist = request.POST.get("iplist").strip()
     appname = request.POST.get("appname").strip()
     ips = re.split("[,;\t\n ]", iplist)
-    logger.info(ips)
+    logger.info("issueips:" + str(ips))
     for ip in ips:
         t = threading.Thread(target=sync, args=[ip, q, appname])
         t.start()
@@ -252,4 +253,15 @@ def javamonitor(request):
 def setagent(request):
     iplist = request.POST.get("iplist").strip()
     ips = re.split("[,;\t\n ]", iplist)
-    pass
+    logger.info("setagent iplist: " + str(ips))
+    agentpath = "/data/project/gceasy/main/javamonitor"
+    tgpath = "/root/javamonitor"
+    ansibleApi(ips).ansible("shell", "[ %s ] && mkdir -p %s" % (tgpath, tgpath))
+    status, msg, results = ansibleApi(ips).ansible("copy", "src=%s/ dest=%s/ mode=0755" % (agentpath, tgpath))
+    #status, msg, results = ansibleApi(ips).ansible("shell", "./%s/client" % tgpath)
+    code = 500
+    logger.info("Ansible play status: " + str(status))
+    logger.info(results)
+    if status:
+        code = 200
+    return HttpResponse(json.dumps({"code": code, "msg": msg}))
