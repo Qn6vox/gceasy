@@ -1,15 +1,16 @@
 #!/bin/bash
 source /etc/profile
-LOGFILE="/root/javamonitor/client.log"
+DIR="/root/javamonitor"
+JAR="client-0.0.3.RELEASE.jar"
 
 case "$1" in
     start)
     echo "Starting ... "
-    nohup java -jar /root/javamonitor/client-0.0.3-SNAPSHOT.jar > $LOGFILE 2>&1 &
+    nohup java -jar $DIR/$JAR > $DIR/client.log 2>&1 &
     ;;
     stop)
     echo "Shutting down ... "
-    /bin/ps -ef | grep client-0.0.3-SNAPSHOT.jar | grep -v grep | awk '{print $2}' | xargs kill -9
+    /bin/ps -ef | grep $JAR | grep -v grep | awk '{print $2}' | xargs kill -9
     ;;
     restart)
     $0 stop

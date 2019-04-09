@@ -63,6 +63,7 @@ def register(request):
     passwd = request.POST.get("passwd", "")
     phonenum = request.POST.get("phonenum", "")
     email = request.POST.get("email", "")
+
     try:
         Users.objects.get(name=username)
         code = 500
@@ -86,6 +87,7 @@ def sendcode(request):
     code = 500
     vecode = captcha(5)
     request.session["vecode"] = vecode
+
     try:
         Users.objects.get(name=username, email=email)
         sendMail([email], "重置密码验证码", vecode)
@@ -102,6 +104,7 @@ def resetSubmit(request):
     passwd = request.POST.get("passwd", "")
     code = 500
     vecode = request.session.get("vecode", "")
+
     if ckcode == vecode:
         user = Users.objects.get(name=username)
         user.password = enpasswd(passwd)
@@ -131,6 +134,7 @@ def sync(ip, q, appname):
     rscmd = 'rsync -e "ssh -o StrictHostKeyChecking=no" -a %s/ root@%s:%s/' % (shpath, ip, propath)
     status, rsshell = commands.getstatusoutput(rscmd)
     logger.info(str(rscmd) + " -- code:" + str(status))
+
     if status:
         code = 500
         msg = "Error: Rsync conf is failed."
@@ -153,6 +157,7 @@ def issue(request):
     appname = request.POST.get("appname").strip()
     ips = re.split("[,;\t\n ]", iplist)
     logger.info("issueips:" + str(ips))
+
     for ip in ips:
         t = threading.Thread(target=sync, args=[ip, q, appname])
         t.start()
@@ -175,6 +180,7 @@ def searchapp(request):
     os.system("ssh -o StrictHostKeyChecking=no root@%s" % ip)
     getapp = "ssh -o StrictHostKeyChecking=no root@%s \"ls -l /usr/local |awk '{print \$9}' |grep \"tomcat*\"\"" % ip
     status, result = commands.getstatusoutput(getapp)
+
     if status:
         code = 500
         msg = "Error: Get applist falied."
@@ -193,16 +199,19 @@ def analyze(request):
     etime = request.GET.get("endtime", "").strip()
     confpath = "/root/gceasy/%s/logpath.conf" % appname
     getpath = "ssh -o StrictHostKeyChecking=no root@%s \"awk '/path/ {print}' %s\"" % (ip, confpath)
+
     try:
         fpath = commands.getoutput(getpath).split("=")[1]
     except IndexError:
         msg = "Error: Something wrong with ip or appname."
         return HttpResponse(json.dumps({"code": code, "msg": msg}))
+
     tpath = "/data/joblog"
     os.system('[ %s ] && mkdir -p %s' % (tpath, tpath))
     getlog = 'rsync -e "ssh -o StrictHostKeyChecking=no" -a root@%s:%s %s/' % (ip, fpath, tpath)
     status, gclog = commands.getstatusoutput(getlog)
     logger.info(str(getlog) + " -- code:" + str(status))
+
     if status:
         msg = "Error: Something wrong with getlog."
     else:
@@ -238,6 +247,7 @@ def checkhis(request):
     stime = request.GET.get("starttime", "").strip()
     etime = request.GET.get("endtime", "").strip()
     logger.info("checkrecordip:" + str(checkip) + " starttime:" + str(stime) + " endtime:" + str(etime))
+
     if stime == etime == "":
         records = Record.objects.filter(ip=checkip)
     elif stime == etime:
@@ -254,28 +264,38 @@ def setagent(request):
     iplist = request.POST.get("iplist").strip()
     ips = re.split("[,;\t\n ]", iplist)
     logger.info("setagent iplist: " + str(ips))
-
-    filepath = '/data/project/javamonitor/application.properties'
-    getnum = "grep -v '#' %s | awk 'END {print}' | awk -F '[][]' '{print $2}'" % filepath
-    i = commands.getoutput(getnum)
-    for ip in ips:
-        i = int(i)+1
-        name = "monitor.serve[%s].name=%s" % (i, ip)
-        address = "monitor.serve[%s].address=http://%s:8081" % (i, ip)
-        with open(filepath, 'a') as f:
-            f.write(name+'\n')
-            f.write(address+'\n')
-            f.close()
-
     agentpath = "/data/project/gceasy/main/javamonitor"
     tgpath = "/root/javamonitor"
+
     ansibleApi(ips).ansible("shell", "[ %s ] && mkdir -p %s" % (tgpath, tgpath))
     ansibleApi(ips).ansible("copy", "src=%s/ dest=%s/ mode=0755" % (agentpath, tgpath))
-    results = ansibleApi(ips).ansible("shell", "/bin/sh %s/client start" % tgpath)
-    logger.info("Ansible result: " + str(results))
-    code = 500
-    msg = "Ansible play failed."
-    if results:
+    results = ansibleApi(ips).ansible("shell", "/bin/sh %s/client.sh start" % tgpath)
+    logger.info(results)
+    failed = results['failed']
+    unreachable = results['unreachable']
+
+    if failed or unreachable:
+        code = 500
+        msg = "Ansible play failed,please check the log."
+    else:
         code = 200
-        msg = "Ansible play success."
+        msg = "Add javamonitor success."
+
+        filepath = '/data/project/javamonitor/application.properties'
+        if 'monitor.serve' in open(filepath).read():
+            getnum = "grep 'serve' %s | awk 'END {print}' | awk -F '[][]' '{print $2}'" % filepath
+            i = int(commands.getoutput(getnum))
+            open(filepath).close()
+        else:
+            i = -1
+
+        for ip in ips:
+            i = i + 1
+            name = "monitor.serve[%s].name=%s" % (i, ip)
+            address = "monitor.serve[%s].address=http://%s:8081" % (i, ip)
+            with open(filepath, 'a') as f:
+                f.write(name + '\n')
+                f.write(address + '\n')
+                f.close()
+        os.system('/bin/sh /data/project/javamonitor/server.sh restart')
     return HttpResponse(json.dumps({"code": code, "msg": msg}))
