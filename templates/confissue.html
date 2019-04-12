@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+<script src="/static/bower_components/bootstrap/js/bootstrap-datepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/bower_components/bootstrap/css/bootstrap-datepicker.css" />
+
 <div class="box">
   <div class="box-header">
     <h3 class="box-title">机器列表</h3>
@@ -17,7 +20,7 @@
   <div class="box-body">
     <div class="row">
       <div class="col-md-2">
-        <input type="text" class="form-control" id="appname">
+        <select type="text" class="form-control" id="appname"></select>
       </div>
       <div class="col-md-2" style="margin-top: 2px">
         <button class="btn btn-info btn-sm" id="issue">分发</button>
@@ -26,11 +29,34 @@
   </div>
 </div>
 
+<script src="/static/js/jquery.combo.select.js"></script>
+<link rel="stylesheet" href="/static/css/combo.select.css">
 <script>
   //控制PageHeader
   $("#pageheader").html($(".treeview-menu .active").children("a").html());
   //控制<请稍等>
   $("#loadingwait").hide();
+
+  //获取服务器应用列表
+  $("#iplist").on("change",function(){
+    iplist = $("#iplist").val().trim();
+    targetip = iplist.split(/[,; \t\n]/,1);
+    url = "/searchapp?targetip="+targetip;
+    $("#appname").comboSelect();
+    $.get(url,function(data){
+      code = data["code"];
+      if (code === 200){
+        applist = data["applist"];
+        $("#appname").empty();
+          $.each(applist,function(index, app){
+            $("#appname").append("<option>"+app+"</option>")
+          });
+        $("#appname").comboSelect();
+      }else {
+        alert(data["msg"])
+      }
+    },"json");
+  });
 
   //提交机器列表
   $("#issue").on("click",function(){
