@@ -2,6 +2,8 @@
 
 # change args here
 APPNAME=$1
+XMS=$2
+XMX=$3
 CONFDIR="/root/gceasy/$APPNAME"
 
 JOBLOG=`cat /usr/local/nginx/conf/sites-e*/joblog.conf | grep alias | grep -v "#"`
@@ -20,7 +22,7 @@ JAVA_VERSION=`java -version 2>&1 | awk -F '"' '/version/ {print $2}'`
 ulimit -c unlimited
 
 ## Memory Options##
-MEM_OPTS="-Xms2g -Xmx4g -XX:NewRatio=1"
+MEM_OPTS="-Xms$XMS -Xmx$XMX -XX:NewRatio=1"
 
 if [[ "$JAVA_VERSION" < "1.8" ]]; then
     MEM_OPTS="$MEM_OPTS -XX:PermSize=128m -XX:MaxPermSize=512m"

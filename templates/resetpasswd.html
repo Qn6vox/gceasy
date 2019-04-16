@@ -1,122 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>重置密码</title>
-  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-  <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css" />
-  <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css" />
-  <link rel="icon" href="/static/img/favicon.ico" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>重置密码</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css"/>
+    <link rel="icon" href="/static/img/favicon.ico"/>
 
-<style>
-  .register-box{
-    border-radius: 20px;
-    width: 360px;
-    height: 75%;
-    margin: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-</style>
+    <style>
+        .register-box {
+            border-radius: 20px;
+            width: 360px;
+            height: 75%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+    </style>
 </head>
-<body class="hold-transition register-page" style="background-image:url(/static/img/bg.jpg); background-repeat:no-repeat; background-size:100%;">
+<body class="hold-transition register-page"
+      style="background-image:url(/static/img/bg.jpg); background-repeat:no-repeat; background-size:100%;">
 <div class="register-box">
-  <div class="register-logo">
-    <a>验证信息</a>
-  </div>
-  <div class=register-box-body>
-    <p class=register-box-msg id="resetpasswdMsg">Reset your password</p>
-    <div class="form-group has-feedback">
-      <input id="username" class="form-control" placeholder="Username">
-      <span class="fa fa-fw fa-user form-control-feedback"></span>
+    <div class="register-logo">
+        <a>验证信息</a>
     </div>
-    <div class="form-group has-feedback">
-      <input id="email" class="form-control" placeholder="Email">
-      <span class="fa fa-fw fa-envelope form-control-feedback"></span>
+    <div class=register-box-body>
+        <p class=register-box-msg id="resetpasswdMsg">Reset your password</p>
+        <div class="form-group has-feedback">
+            <input id="username" class="form-control" placeholder="Username">
+            <span class="fa fa-fw fa-user form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            <input id="email" class="form-control" placeholder="Email">
+            <span class="fa fa-fw fa-envelope form-control-feedback"></span>
+        </div>
+        <div class="row">
+            <div class="col-xs-8"></div>
+            <div class="col-xs-4">
+                <button id="sendcode" class="btn btn-primary btn-block btn-flat">发送验证码</button>
+            </div>
+        </div>
+        <div class="form-group has-feedback" style="margin: 15px 0">
+            <input id="captcha" class="form-control" placeholder="Verification code">
+            <span class="fa fa-fw fa-file-excel-o form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            <input id="passwd" type="password" class="form-control" placeholder="Password">
+            <span class="fa fa-fw fa-lock form-control-feedback"></span>
+        </div>
+        <div class="form-group has-feedback">
+            <input id="ckpasswd" type="password" class="form-control" placeholder="Confirm password">
+            <span class="fa fa-fw fa-lock form-control-feedback"></span>
+        </div>
+        <div class="row">
+            <div class="col-xs-8"></div>
+            <div class="col-xs-4">
+                <button id="resetSubmit" class="btn btn-primary btn-block btn-flat">提交</button>
+            </div>
+        </div>
     </div>
-    <div class="row">
-      <div class="col-xs-8"></div>
-      <div class="col-xs-4">
-        <button id="sendcode" class="btn btn-primary btn-block btn-flat">发送验证码</button>
-      </div>
-    </div>
-    <div class="form-group has-feedback" style="margin: 15px 0">
-      <input id="captcha" class="form-control" placeholder="Verification code">
-      <span class="fa fa-fw fa-file-excel-o form-control-feedback"></span>
-    </div>
-    <div class="form-group has-feedback">
-      <input id="passwd" type="password" class="form-control" placeholder="Password">
-      <span class="fa fa-fw fa-lock form-control-feedback"></span>
-    </div>
-    <div class="form-group has-feedback">
-      <input id="ckpasswd" type="password" class="form-control" placeholder="Confirm password">
-      <span class="fa fa-fw fa-lock form-control-feedback"></span>
-    </div>
-    <div class="row">
-      <div class="col-xs-8"></div>
-      <div class="col-xs-4">
-        <button id="resetSubmit" class="btn btn-primary btn-block btn-flat">提交</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/static/tools/checkinput.js"></script>
 <script>
-  // 发送验证码
-  $("#sendcode").on("click",function(){
-    username = $("#username").val();
-    email = $("#email").val();
-    if (username === "" || email === ""){
-      $("#resetpasswdMsg").html("验证信息均为必填项")
-    }else if (!checkEmail(email)){
-      $("#resetpasswdMsg").html("邮箱格式不正确，请重新输入")
-    }else {
-      url = "/sendcode";
-      $.post(url, {"username":username, "email":email}, function(data){
-        code = data["code"];
-        if (code === 200){
-          $("#resetpasswdMsg").html(data["msg"])
-        }else {
-          $("#resetpasswdMsg").html(data["msg"])
+    // 发送验证码
+    $("#sendcode").on("click", function () {
+        username = $("#username").val();
+        email = $("#email").val();
+        if (username === "" || email === "") {
+            $("#resetpasswdMsg").html("验证信息均为必填项")
+        } else if (!checkEmail(email)) {
+            $("#resetpasswdMsg").html("邮箱格式不正确，请重新输入")
+        } else {
+            url = "/sendcode";
+            $.post(url, {"username": username, "email": email}, function (data) {
+                code = data["code"];
+                if (code === 200) {
+                    $("#resetpasswdMsg").html(data["msg"])
+                } else {
+                    $("#resetpasswdMsg").html(data["msg"])
+                }
+            }, "json")
         }
-      },"json")
-    }
-  });
+    });
 
-  // 提交
-  $("#resetSubmit").on("click",function(){
-    username = $("#username").val();
-    captcha = $("#captcha").val();
-    passwd = $("#passwd").val();
-    ckpasswd = $("#ckpasswd").val();
-    if (username === "" || captcha === "" || passwd === "" || ckpasswd === ""){
-      $("#resetpasswdMsg").html("重置信息均为必填项，请重新输入");
-    }else if (ckpasswd !== passwd){
-      $("#resetpasswdMsg").html("两次输入的密码不一致，请重新输入");
-      document.getElementById("passwd").value = "";
-      document.getElementById("ckpasswd").value = "";
-    }else {
-      url = "/resetSubmit";
-      $.post(url, {"username":username, "passwd":passwd, "captcha":captcha}, function(data){
-        code = data["code"];
-        if (code === 200){
-          alert(data["msg"]);
-          window.location.href = data["url"]
-        }else {
-          $("#resetpasswdMsg").html(data["msg"]);
-          document.getElementById("captcha").value = "";
+    // 提交
+    $("#resetSubmit").on("click", function () {
+        username = $("#username").val();
+        captcha = $("#captcha").val();
+        passwd = $("#passwd").val();
+        ckpasswd = $("#ckpasswd").val();
+        if (username === "" || captcha === "" || passwd === "" || ckpasswd === "") {
+            $("#resetpasswdMsg").html("重置信息均为必填项，请重新输入");
+        } else if (ckpasswd !== passwd) {
+            $("#resetpasswdMsg").html("两次输入的密码不一致，请重新输入");
+            document.getElementById("passwd").value = "";
+            document.getElementById("ckpasswd").value = "";
+        } else {
+            url = "/resetSubmit";
+            $.post(url, {"username": username, "passwd": passwd, "captcha": captcha}, function (data) {
+                code = data["code"];
+                if (code === 200) {
+                    alert(data["msg"]);
+                    window.location.href = data["url"]
+                } else {
+                    $("#resetpasswdMsg").html(data["msg"]);
+                    document.getElementById("captcha").value = "";
+                }
+            }, "json")
         }
-      },"json")
-    }
-  });
+    });
 </script>
 </body>
 </html>

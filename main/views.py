@@ -47,7 +47,7 @@ def login(request):
     #     msg = "用户名或密码错误，请重新输入"
     #     url = request.session.get("url", "/")
 
-    return HttpResponse(json.dumps({"code": code, "msg": msg, "url":url}))
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "url": url}))
 
 # 登出
 def logout(request):
@@ -121,13 +121,13 @@ def resetSubmit(request):
 # 首页
 def index(request):
     username = request.session.get("username", "")
-    return render_to_response("starter.html", {"username":username})
+    return render_to_response("starter.html", {"username": username})
 
 # 配置分发
 def confissue(request):
     return render_to_response("confissue.html")
 
-def sync(ip, q, appname):
+def sync(ip, q, appname, xms, xmx):
     shpath = "/data/project/gceasy/main/script"
     propath = "/root/gceasy/%s" % appname
     os.system('ssh -o StrictHostKeyChecking=no root@%s "[ %s ] && mkdir -p %s"' % (ip, propath, propath))
@@ -139,7 +139,8 @@ def sync(ip, q, appname):
         code = 500
         msg = "Error: Rsync conf is failed."
     else:
-        shcmd = 'ssh -o StrictHostKeyChecking=no root@%s "/bin/sh %s/setopts.sh %s"' % (ip, propath, appname)
+        shcmd = 'ssh -o StrictHostKeyChecking=no root@%s "/bin/sh %s/setopts.sh %s %s %s"' % (
+            ip, propath, appname, xms, xmx)
         status, shres = commands.getstatusoutput(shcmd)
         logger.info(str(shcmd) + " -- code:" + str(status))
         if status:
@@ -155,11 +156,13 @@ def issue(request):
     q = Queue.Queue()
     iplist = request.POST.get("iplist").strip()
     appname = request.POST.get("appname").strip()
+    xms = request.POST.get("xms").strip()
+    xmx = request.POST.get("xmx").strip()
     ips = re.split("[,;\t\n ]", iplist)
     logger.info("issueips:" + str(ips))
 
     for ip in ips:
-        t = threading.Thread(target=sync, args=[ip, q, appname])
+        t = threading.Thread(target=sync, args=[ip, q, appname, xms, xmx])
         t.start()
     while True:
         if q.qsize() == len(ips):
@@ -188,7 +191,7 @@ def searchapp(request):
     for app in result.split():
         applist.append(app)
     logger.info(str(ip) + " -- applist=" + str(applist))
-    return HttpResponse(json.dumps({"code": code, "msg": msg, "applist":applist}))
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "applist": applist}))
 
 def analyze(request):
     code = 500
@@ -224,7 +227,8 @@ def analyze(request):
         else:
             st = "%sT00%%3A00%%3A00.000-0700" % stime
             et = "%sT24%%3A00%%3A00.000-0700" % etime
-            getreport = 'curl %s @%s https://api.gceasy.io/analyzeGC?apiKey=%s&startTime=%s&endTime=%s' % (arg, path, apiKey, st, et)
+            getreport = 'curl %s @%s https://api.gceasy.io/analyzeGC?apiKey=%s&startTime=%s&endTime=%s' % (
+                arg, path, apiKey, st, et)
         status, result = commands.getstatusoutput(getreport)
         logger.info(getreport)
         logger.info(result)
@@ -235,12 +239,12 @@ def analyze(request):
             reporturl = data["graphURL"]
             Record(ip=ip, url=reporturl).save()
             code = 200
-    return HttpResponse(json.dumps({"code":code, "msg":msg, "reporturl":reporturl, "result":result}))
+    return HttpResponse(json.dumps({"code": code, "msg": msg, "reporturl": reporturl, "result": result}))
 
 # 历史记录
 def hisrecord(request):
     records = Record.objects.all()
-    return render_to_response("hisrecord.html", {"records":records})
+    return render_to_response("hisrecord.html", {"records": records})
 
 def checkhis(request):
     checkip = request.GET.get("checkip", "").strip()
@@ -253,8 +257,8 @@ def checkhis(request):
     elif stime == etime:
         records = Record.objects.filter(Q(ip=checkip), Q(time__gt=stime, time__lt="%s 23:59:59" % etime))
     else:
-        records = Record.objects.filter(Q(ip=checkip), Q(time__gt="%s 23:59:59" %stime, time__lt=etime))
-    return render_to_response("hisrecord.html", {"records":records, "checkip":checkip})
+        records = Record.objects.filter(Q(ip=checkip), Q(time__gt="%s 23:59:59" % stime, time__lt=etime))
+    return render_to_response("hisrecord.html", {"records": records, "checkip": checkip})
 
 # 应用监控
 def javamonitor(request):

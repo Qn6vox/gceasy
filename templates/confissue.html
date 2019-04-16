@@ -1,78 +1,100 @@
 <!DOCTYPE html>
 <html>
 <script src="/static/bower_components/bootstrap/js/bootstrap-datepicker.js"></script>
-<link rel="stylesheet" type="text/css" href="/static/bower_components/bootstrap/css/bootstrap-datepicker.css" />
+<link rel="stylesheet" type="text/css" href="/static/bower_components/bootstrap/css/bootstrap-datepicker.css"/>
 
 <div class="box">
-  <div class="box-header">
-    <h3 class="box-title">机器列表</h3>
-  </div>
-  <div class="box-body">
-    <div class="row">
-      <div class="modal-body">
-        <textarea id="iplist" class="form-control" rows="5" style="resize:none" placeholder="可写入多个IP"></textarea>
-      </div>
+    <div class="box-header">
+        <h3 class="box-title">机器列表</h3>
     </div>
-  </div>
-  <div class="box-header">
-    <h3 class="box-title">应用名称</h3>
-  </div>
-  <div class="box-body">
-    <div class="row">
-      <div class="col-md-2">
-        <select type="text" class="form-control" id="appname"></select>
-      </div>
-      <div class="col-md-2" style="margin-top: 2px">
-        <button class="btn btn-info btn-sm" id="issue">分发</button>
-      </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="modal-body">
+                <textarea id="iplist" class="form-control" rows="5" style="resize:none"
+                          placeholder="可写入多个IP"></textarea>
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="box-header">
+        <h3 class="box-title">应用名称</h3>
+    </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-2" style="width: 280px">
+                <select type="text" class="form-control" id="appname"></select>
+            </div>
+        </div>
+    </div>
+    <div class="box-header">
+        <h3 class="box-title">参数选择</h3>
+    </div>
+    <div class="box-body">
+        <div class="row">
+            <div class="col-md-2">
+                <label for="xms">-Xms:</label><input type="text" class="form-control" id="xms" value="2g">
+            </div>
+            <div class="col-md-2">
+                <label for="xmx">-Xmx:</label><input type="text" class="form-control" id="xmx" value="4g">
+            </div>
+            <div class="col-md-2" style="margin-top: 18px">
+                <button class="btn btn-info btn-sm" id="issue">分发</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/static/js/jquery.combo.select.js"></script>
 <link rel="stylesheet" href="/static/css/combo.select.css">
+<script src="/static/pace/pace.js"></script>
+<link rel="stylesheet" href="/static/pace/themes/pace-theme-bounce.css">
 <script>
-  //控制PageHeader
-  $("#pageheader").html($(".treeview-menu .active").children("a").html());
-  //控制<请稍等>
-  $("#loadingwait").hide();
+    //控制PageHeader
+    $("#pageheader").html($(".treeview-menu .active").children("a").html());
+    //控制<请稍等>
+    //$("#loadingwait").hide();
+    //初始化进度条
+    $(document).ajaxStart(function () {
+        Pace.restart()
+    });
 
-  //获取服务器应用列表
-  $("#iplist").on("change",function(){
-    iplist = $("#iplist").val().trim();
-    targetip = iplist.split(/[,; \t\n]/,1);
-    url = "/searchapp?targetip="+targetip;
-    $("#appname").comboSelect();
-    $.get(url,function(data){
-      code = data["code"];
-      if (code === 200){
-        applist = data["applist"];
-        $("#appname").empty();
-          $.each(applist,function(index, app){
-            $("#appname").append("<option>"+app+"</option>")
-          });
+    //获取服务器应用列表
+    $("#iplist").on("change", function () {
+        iplist = $("#iplist").val().trim();
+        targetip = iplist.split(/[,; \t\n]/, 1);
+        url = "/searchapp?targetip=" + targetip;
         $("#appname").comboSelect();
-      }else {
-        alert(data["msg"])
-      }
-    },"json");
-  });
+        $.get(url, function (data) {
+            code = data["code"];
+            if (code === 200) {
+                applist = data["applist"];
+                $("#appname").empty();
+                $.each(applist, function (index, app) {
+                    $("#appname").append("<option>" + app + "</option>")
+                });
+                $("#appname").comboSelect();
+            } else {
+                alert(data["msg"])
+            }
+        }, "json");
+    });
 
-  //提交机器列表
-  $("#issue").on("click",function(){
-    iplist = $("#iplist").val().trim();
-    appname = $("#appname").val().trim();
-    if (iplist === "" || appname === ""){
-      alert("请输入机器IP和应用名称")
-    }else {
-      url = "/issue";
-      $("#loadingwait").show();
-      $.post(url, {"iplist":iplist, "appname":appname}, function(data){
-        $("#loadingwait").hide();
-        alert(data)
-      });
-      $(this).blur()
-    }
-  });
+    //提交机器列表
+    $("#issue").on("click", function () {
+        iplist = $("#iplist").val().trim();
+        appname = $("#appname").val().trim();
+        xms = $("#xms").val().trim();
+        xmx = $("#xmx").val().trim();
+        if (iplist === "" || appname === "") {
+            alert("请输入机器IP和应用名称")
+        } else {
+            url = "/issue";
+            //$("#loadingwait").show();
+            $.post(url, {"iplist": iplist, "appname": appname, "xms": xms, "xmx": xmx}, function (data) {
+                //$("#loadingwait").hide();
+                alert(data)
+            });
+            $(this).blur()
+        }
+    });
 </script>
 </html>
