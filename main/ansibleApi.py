@@ -12,13 +12,13 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.plugins.callback import CallbackBase
 
 class ResultCallback(CallbackBase):
-    def __init__(self, * args, **kwargs):
-        super(ResultCallback, self).__init__(* args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(ResultCallback, self).__init__(*args, **kwargs)
         self.host_ok = {}
         self.host_unreachable = {}
         self.host_failed = {}
 
-    def v2_runner_on_ok(self, result, * args, **kwargs):
+    def v2_runner_on_ok(self, result, *args, **kwargs):
         self.host_ok[result._host.get_name()] = result
 
     def v2_runner_on_failed(self, result, *args, **kwargs):
@@ -65,10 +65,10 @@ class ansibleApi:
 
     def ansible(self, module, args=""):
         play_source = dict(
-            name = "Ansible Play",
-            hosts = 'all',
-            gather_facts = 'no',
-            tasks = [
+            name="Ansible Play",
+            hosts='all',
+            gather_facts='no',
+            tasks=[
                 dict(action=dict(module=module, args=args), register='shell_out')
             ]
         )
@@ -114,5 +114,5 @@ class ansibleApi:
         pb.run()
 
 if __name__ == '__main__':
-    #ansibleApi(['10.5.19.1','10.5.19.2']).ansible("file", "path=/root/ansibletest state=touch")
-    ansibleApi(['10.5.19.1','10.5.19.2']).playbook(["/etc/ansible/roles/test.yml"])
+    # ansibleApi(['10.5.19.1','10.5.19.2']).ansible("file", "path=/root/ansibletest state=touch")
+    ansibleApi(['10.5.19.1', '10.5.19.2']).playbook(["/etc/ansible/roles/test.yml"])

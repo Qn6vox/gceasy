@@ -5,10 +5,10 @@ import ldap, logging
 
 logger = logging.getLogger("info")
 
-ldappath = "ldap://ldap.dangdang.com"   #ldap服务器地址
-baseDN = "ou=KeWenDangDang,dc=dangdang,dc=com"  #根目录
-ldapuser = "adsmart@dangdang.com"   #ldap服务器用户名
-ldappass = "sl-1234"    #ldap服务器密码
+ldappath = "ldap://ldap.dangdang.com"  # ldap服务器地址
+baseDN = "ou=KeWenDangDang,dc=dangdang,dc=com"  # 根目录
+ldapuser = "adsmart@dangdang.com"  # ldap服务器用户名
+ldappass = "sl-1234"  # ldap服务器密码
 ldapUsers = []
 
 # 获取用户dn
@@ -18,10 +18,10 @@ def getDN(username, total=False, retry=30):
             l = ldap.initialize(ldappath)
             l.protocol_version = ldap.VERSION3
             l.simple_bind(ldapuser, ldappass)
-            searchScope  = ldap.SCOPE_SUBTREE
+            searchScope = ldap.SCOPE_SUBTREE
             retrieveAttributes = None
             searchFilter = "(sAMAccountName=%s)" % username
-            
+
             if total:
                 ldap_result = l.search_s(baseDN, searchScope, searchFilter, retrieveAttributes)
                 return ldap_result
@@ -30,7 +30,7 @@ def getDN(username, total=False, retry=30):
                 result_type, result_data = l.result(ldap_result_id, 1)
                 dn = result_data[0][0]
             return dn
-        except Exception,e:
+        except Exception, e:
             print e
             pass
         retry -= 1

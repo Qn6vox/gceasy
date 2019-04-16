@@ -52,13 +52,12 @@
 <script>
     //控制PageHeader
     $("#pageheader").html($(".treeview-menu .active").children("a").html());
-    //控制<请稍等>
+    //控制进度条
     $("#loadingwait").hide();
     //Table样式
     $('#recordTable').DataTable({
         "order": [[1, "desc"]]
     });
-
     //日期插件
     $('.input-daterange input').each(function () {
         $(this).datepicker('clearDates');

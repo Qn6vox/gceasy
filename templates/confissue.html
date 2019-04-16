@@ -45,17 +45,11 @@
 
 <script src="/static/js/jquery.combo.select.js"></script>
 <link rel="stylesheet" href="/static/css/combo.select.css">
-<script src="/static/pace/pace.js"></script>
-<link rel="stylesheet" href="/static/pace/themes/pace-theme-bounce.css">
 <script>
     //控制PageHeader
     $("#pageheader").html($(".treeview-menu .active").children("a").html());
-    //控制<请稍等>
-    //$("#loadingwait").hide();
-    //初始化进度条
-    $(document).ajaxStart(function () {
-        Pace.restart()
-    });
+    //控制进度条
+    $("#loadingwait").hide();
 
     //获取服务器应用列表
     $("#iplist").on("change", function () {
@@ -88,9 +82,9 @@
             alert("请输入机器IP和应用名称")
         } else {
             url = "/issue";
-            //$("#loadingwait").show();
+            $("#loadingwait").show();
             $.post(url, {"iplist": iplist, "appname": appname, "xms": xms, "xmx": xmx}, function (data) {
-                //$("#loadingwait").hide();
+                $("#loadingwait").hide();
                 alert(data)
             });
             $(this).blur()
