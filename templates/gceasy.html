@@ -32,7 +32,7 @@
             <div class="col-md-2" style="width: 280px">
                 <select class="form-control" id="appname"></select>
             </div>
-            <div class="col-md-2" style="margin-top: 2px">
+            <div class="col-md-1" style="margin-top: 2px">
                 <button class="btn btn-info btn-sm" id="analyze">分析</button>
             </div>
         </div>
@@ -51,27 +51,32 @@
     $("#loadingwait").hide();
     //日期插件
     $('.input-daterange input').each(function () {
-        $(this).datepicker('clearDates');
+        $(this).datepicker('clearDates')
     });
 
     //获取服务器应用列表
     $("#targetip").on("change", function () {
         targetip = $("#targetip").val().trim();
-        url = "/searchapp?targetip=" + targetip;
-        $("#appname").comboSelect();
-        $.get(url, function (data) {
-            code = data["code"];
-            if (code === 200) {
-                applist = data["applist"];
-                $("#appname").empty();
-                $.each(applist, function (index, app) {
-                    $("#appname").append("<option>" + app + "</option>")
-                });
-                $("#appname").comboSelect();
-            } else {
-                alert(data["msg"])
-            }
-        }, "json");
+        if (targetip === "") {
+            alert("请输入机器IP");
+            document.getElementById("appname").value = ""
+        } else {
+            url = "/searchapp?targetip=" + targetip;
+            $("#appname").comboSelect();
+            $.get(url, function (data) {
+                code = data["code"];
+                if (code === 200) {
+                    applist = data["applist"];
+                    $("#appname").empty();
+                    $.each(applist, function (index, app) {
+                        $("#appname").append("<option>" + app + "</option>")
+                    });
+                    $("#appname").comboSelect()
+                } else {
+                    alert(data["msg"])
+                }
+            }, "json")
+        }
     });
 
     //提交分析
@@ -110,8 +115,8 @@
         const e = event || window.event;
         if (e.keyCode === 13) {
             $("#analyze").click();
-            return false;
+            return false
         }
-    };
+    }
 </script>
 </html>

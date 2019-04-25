@@ -73,17 +73,17 @@
         phonenum = $("#phonenum").val();
         email = $("#email").val();
         if (username === "" || passwd === "" || ckpasswd === "" || phonenum === "" || email === "") {
-            $("#registerMsg").html("注册信息均为必填项，请重新输入");
+            $("#registerMsg").html("注册信息均为必填项，请重新输入")
         } else if (ckpasswd !== passwd) {
             $("#registerMsg").html("两次输入的密码不一致，请重新输入");
             document.getElementById("passwd").value = "";
-            document.getElementById("ckpasswd").value = "";
+            document.getElementById("ckpasswd").value = ""
         } else if (!checkPhone(phonenum)) {
             $("#registerMsg").html("手机号码格式不正确，请重新输入");
-            document.getElementById("phonenum").value = "";
+            document.getElementById("phonenum").value = ""
         } else if (!checkEmail(email)) {
             $("#registerMsg").html("邮箱格式不正确，请重新输入");
-            document.getElementById("email").value = "";
+            document.getElementById("email").value = ""
         } else {
             url = "/register";
             $.post(url, {
@@ -98,7 +98,7 @@
                     window.location.href = data["url"]
                 } else {
                     $("#registerMsg").html(data["msg"]);
-                    document.getElementById("username").value = "";
+                    document.getElementById("username").value = ""
                 }
             }, "json")
         }
@@ -109,9 +109,9 @@
         const e = event || window.event;
         if (e.keyCode === 13) {
             $("#registerSubmit").click();
-            return false;
+            return false
         }
-    };
+    }
 </script>
 </body>
 </html>

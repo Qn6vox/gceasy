@@ -99,11 +99,11 @@
         passwd = $("#passwd").val();
         ckpasswd = $("#ckpasswd").val();
         if (username === "" || captcha === "" || passwd === "" || ckpasswd === "") {
-            $("#resetpasswdMsg").html("重置信息均为必填项，请重新输入");
+            $("#resetpasswdMsg").html("重置信息均为必填项，请重新输入")
         } else if (ckpasswd !== passwd) {
             $("#resetpasswdMsg").html("两次输入的密码不一致，请重新输入");
             document.getElementById("passwd").value = "";
-            document.getElementById("ckpasswd").value = "";
+            document.getElementById("ckpasswd").value = ""
         } else {
             url = "/resetSubmit";
             $.post(url, {"username": username, "passwd": passwd, "captcha": captcha}, function (data) {
@@ -113,11 +113,11 @@
                     window.location.href = data["url"]
                 } else {
                     $("#resetpasswdMsg").html(data["msg"]);
-                    document.getElementById("captcha").value = "";
+                    document.getElementById("captcha").value = ""
                 }
             }, "json")
         }
-    });
+    })
 </script>
 </body>
 </html>

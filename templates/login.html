@@ -60,7 +60,7 @@
         passwd = $("#passwd").val();
         console.log(username, passwd);
         if (username === "" || passwd === "") {
-            $("#loginMsg").html("用户名或密码不能为空，请重新输入");
+            $("#loginMsg").html("用户名或密码不能为空，请重新输入")
         } else {
             url = "/login";
             $.post(url, {"username": username, "passwd": passwd}, function (data) {
@@ -70,7 +70,7 @@
                 } else {
                     $("#loginMsg").html(data["msg"]);
                     document.getElementById("username").value = "";
-                    document.getElementById("passwd").value = "";
+                    document.getElementById("passwd").value = ""
                 }
             }, "json")
         }
@@ -82,9 +82,9 @@
         const e = event || window.event;
         if (e.keyCode === 13) {
             $("#loginSubmit").click();
-            return false;
+            return false
         }
-    };
+    }
 </script>
 </body>
 </html>

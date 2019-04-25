@@ -36,7 +36,7 @@
             <div class="col-md-2">
                 <label for="xmx">-Xmx:</label><input type="text" class="form-control" id="xmx" value="4g">
             </div>
-            <div class="col-md-2" style="margin-top: 18px">
+            <div class="col-md-1" style="margin-top: 27px">
                 <button class="btn btn-info btn-sm" id="issue">分发</button>
             </div>
         </div>
@@ -55,21 +55,26 @@
     $("#iplist").on("change", function () {
         iplist = $("#iplist").val().trim();
         targetip = iplist.split(/[,; \t\n]/, 1);
-        url = "/searchapp?targetip=" + targetip;
-        $("#appname").comboSelect();
-        $.get(url, function (data) {
-            code = data["code"];
-            if (code === 200) {
-                applist = data["applist"];
-                $("#appname").empty();
-                $.each(applist, function (index, app) {
-                    $("#appname").append("<option>" + app + "</option>")
-                });
-                $("#appname").comboSelect();
-            } else {
-                alert(data["msg"])
-            }
-        }, "json");
+        if (targetip === "") {
+            alert("请输入机器IP");
+            document.getElementById("appname").value = ""
+        } else {
+            url = "/searchapp?targetip=" + targetip;
+            $("#appname").comboSelect();
+            $.get(url, function (data) {
+                code = data["code"];
+                if (code === 200) {
+                    applist = data["applist"];
+                    $("#appname").empty();
+                    $.each(applist, function (index, app) {
+                        $("#appname").append("<option>" + app + "</option>")
+                    });
+                    $("#appname").comboSelect()
+                } else {
+                    alert(data["msg"])
+                }
+            }, "json")
+        }
     });
 
     //提交机器列表
@@ -89,6 +94,6 @@
             });
             $(this).blur()
         }
-    });
+    })
 </script>
 </html>

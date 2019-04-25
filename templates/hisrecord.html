@@ -22,7 +22,7 @@
             <div class="col-md-2">
                 <input type="text" class="form-control" id="checkip" value="{{ checkip }}">
             </div>
-            <div class="col-md-2" style="margin-top: 2px">
+            <div class="col-md-1" style="margin-top: 2px">
                 <button class="btn btn-info btn-sm" id="checkrecord">查询</button>
             </div>
         </div>
@@ -60,7 +60,7 @@
     });
     //日期插件
     $('.input-daterange input').each(function () {
-        $(this).datepicker('clearDates');
+        $(this).datepicker('clearDates')
     });
 
     //提交查询
@@ -74,6 +74,7 @@
             url = "/checkhis?checkip=" + checkip + "&starttime=" + starttime + "&endtime=" + endtime;
             $("#loadingwait").show();
             $("#info").load(url);
+            $(this).blur()
         }
     });
 
@@ -82,8 +83,8 @@
         const e = event || window.event;
         if (e.keyCode === 13) {
             $("#checkrecord").click();
-            return false;
+            return false
         }
-    };
+    }
 </script>
 </html>
